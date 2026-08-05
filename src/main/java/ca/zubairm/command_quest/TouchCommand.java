@@ -3,25 +3,26 @@ package ca.zubairm.command_quest;
 public class TouchCommand extends AbstractCommand {
 
     public TouchCommand() {
-        super(
-            "touch",              
-            "file",              
-            "\\w+\\.\\w+",        
-            """
-            To make a file type the touch command
-			Next type name of the file you want it to be called
-			Finally type the file extension
-	
-			Here's an example: touch itsAMeMario.jpg
-	
-			Easy right?
-	
-			Now you try.
-	
-			To go back to main menu type * else proceed with your file creation!
-            """,
-            "touch chicken.leg"   
-        );
+    	super(
+    		    "touch",
+    		    "file",
+    		    "\\w+\\.\\w+",
+    		    """
+    		    To make a file, type the touch command.
+    		    Next, type the name you want the file to have.
+    		    Finally, type the file extension.
+
+    		    Here's an example: touch itsAMeMario.jpg
+
+    		    Easy, right?
+
+    		    Now you try.
+
+    		    To go back to the main menu, type *.
+    		    Otherwise, proceed with your file creation!
+    		    """,
+    		    "touch chicken.leg"
+    		);
     }
 
     @Override

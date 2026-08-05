@@ -80,7 +80,12 @@ public class App {
                 case 5:
                     System.out.println("coming soon");
                     break;
+                //view of current folder
+                    
                 case 3:
+                	System.out.println("\nHere are your current files and folders!");
+                	System.out.println("");
+           
 
                     if (currentFolder.getFiles().isEmpty() && currentFolder.getSubFolders().isEmpty()) {
                         System.out.println("(empty)");
@@ -91,7 +96,8 @@ public class App {
                                 .forEach(n -> System.out.println(n + "/"));
                         currentFolder.getFiles().stream()
                                 .sorted()
-                                .forEach(name -> System.out.println(name));
+                                //printing each folder and name
+                                .forEach(name -> System.out.println(name+"\n"));
                     }
                     break;
                 case 0:

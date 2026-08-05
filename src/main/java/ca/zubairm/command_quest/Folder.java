@@ -36,7 +36,7 @@ public class Folder {
 		return files.contains(file);
 	}
 
-	// Folder
+	// SubFolders
 
 	public boolean hasSubFolder(String folder) {
 

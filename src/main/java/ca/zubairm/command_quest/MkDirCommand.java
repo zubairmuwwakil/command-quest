@@ -3,26 +3,26 @@ package ca.zubairm.command_quest;
 public class MkDirCommand extends AbstractCommand {
 
     public MkDirCommand() {
-        super(
-            "mkdir",             
-            "folder",             
-            "\\w+",        
-            """
-            To make a folder type the mkdir command
-			Next type the name of the folder (what you want it to be called)
-			Finally... jk thats it you're done !!
+    	super(
+    		    "mkdir",
+    		    "folder",
+    		    "\\w+",
+    		    """
+    		    To make a folder, type the mkdir command.
+    		    Next, type the name of the folder.
+    		    Finally... that's it, you're done!
 
-			Here's an example: mkdir UScream4IceCream
+    		    Here's an example: mkdir UScream4IceCream
 
-			Easy right?
+    		    Easy, right?
 
-			Now you try.
+    		    Now you try.
 
-			To go back to main menu type * else proceed with your folder creation!
- 
-            """,
-            "mkdir one4All"  
-        );
+    		    To go back to the main menu, type *.
+    		    Otherwise, proceed with your folder creation!
+    		    """,
+    		    "mkdir one4All"
+    		);
     }
 
     @Override

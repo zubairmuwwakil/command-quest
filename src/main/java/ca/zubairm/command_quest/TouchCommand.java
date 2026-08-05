@@ -19,8 +19,6 @@ public class TouchCommand extends AbstractCommand {
 			Now you try.
 	
 			To go back to main menu type * else proceed with your file creation!
-	
-			Enter command:
             """,
             "touch chicken.leg"   
         );

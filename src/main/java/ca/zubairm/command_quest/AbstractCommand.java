@@ -57,7 +57,7 @@ public abstract class AbstractCommand implements Command {
            
             else {
                 create(folder, tokens[1]);
-                System.out.println("\n" + capitalize(noun) + " Successfully created!");
+                System.out.println("\n" + capitalize(noun) + " Successfully created!\n");
                 done = true;
             }
         }

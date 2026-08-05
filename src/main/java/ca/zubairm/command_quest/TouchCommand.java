@@ -28,11 +28,14 @@ public class TouchCommand extends AbstractCommand {
 
     @Override
     protected boolean exists(Folder folder, String name) {
-        // return whether the file already exists   (hint: folder.hasFile)
+        // return whether the file already exists
+    	return (folder.hasFile(name));
     }
 
     @Override
     protected void create(Folder folder, String name) {
-        // create the file   (hint: folder.addFile)
+        // create the file 
+    	folder.addFile(name);
+    	
     }
 }

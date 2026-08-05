@@ -5,7 +5,7 @@ public class MkDirCommand extends AbstractCommand {
     public MkDirCommand() {
         super(
             "mkdir",             
-            "subfolder",             
+            "folder",             
             "\\w+",        
             """
             To make a folder type the mkdir command
@@ -21,15 +21,23 @@ public class MkDirCommand extends AbstractCommand {
 			To go back to main menu type * else proceed with your folder creation!
  
             """,
-            "one4All"  
+            "mkdir one4All"  
         );
     }
 
     @Override
     protected boolean exists(Folder folder, String name) {
+    	
+    	//check if folder exists
+    	return(folder.hasSubFolder(name));
+    	
     }
 
     @Override
     protected void create(Folder folder, String name) {
+    	
+    	//create a folder
+    	folder.addSubFolder(name);
+    	
     }
 }

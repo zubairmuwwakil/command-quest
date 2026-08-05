@@ -14,7 +14,7 @@ public class App {
 
         Folder currentFolder = new Folder("root");
         Command makeFile   = new TouchCommand();
-        Command makeFolder = new MkdirCommand();
+        Command makeFolder = new MkDirCommand();
         currentFolder.addFile("todo.md");
         currentFolder.addFile("notes.txt");
 

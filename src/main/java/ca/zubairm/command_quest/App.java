@@ -13,6 +13,8 @@ public class App {
         int operatingSystem = -1;
 
         Folder currentFolder = new Folder("root");
+        Command makeFile   = new TouchCommand();
+        Command makeFolder = new MkdirCommand();
         currentFolder.addFile("todo.md");
         currentFolder.addFile("notes.txt");
 
@@ -154,7 +156,7 @@ public class App {
                 		// OUTCOME 1: wrong format -> show example and re-prompt.
                 		if (tokens.length < 2 || !tokens[0].equals("mkdir") || !tokens[1].matches("\\w+")) {
                 			System.out.println("\nNot quite - the format was off.");
-                			System.out.println("Here's another example: mkdir chickenCoop\n");
+                			System.out.println("Here's another example: mkdir one4All\n");
                 			System.out.print("Enter command: ");
                 		}
                 		// OUTCOME 3: format correct, but that file already exists -> re-prompt.

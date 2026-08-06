@@ -1,5 +1,7 @@
 package ca.zubairm.command_quest;
 
+//Inheritance for OOP 
+
 public class TouchCommand extends AbstractCommand {
 
     public TouchCommand() {

@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 public class Folder {
-
+	
+	//Encapsulation for OOP
+	
 	private String name;
 	private List<String> files;
 	private Map<String, Folder> subFolders;

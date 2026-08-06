@@ -13,8 +13,16 @@ public class App {
         int operatingSystem = -1;
 
         Folder currentFolder = new Folder("root");
+        
+        //Polymorphism        
         Command makeFile   = new TouchCommand();
         Command makeFolder = new MkDirCommand();
+        
+        // work on more concrete examples of polymorphism in code 
+        //check day 6 in teacherled
+        // -> command is an interface said variable is set = to 
+        // a sub class 
+       
         currentFolder.addFile("todo.md");
         currentFolder.addFile("notes.txt");
 

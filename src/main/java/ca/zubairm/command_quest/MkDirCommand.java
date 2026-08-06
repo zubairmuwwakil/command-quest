@@ -1,5 +1,7 @@
 package ca.zubairm.command_quest;
 
+
+//Inheritance for OOP 
 public class MkDirCommand extends AbstractCommand {
 
     public MkDirCommand() {

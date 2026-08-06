@@ -2,6 +2,7 @@ package ca.zubairm.command_quest;
 
 import java.util.Scanner;
 
+//abstraction for OOP
 
 public abstract class AbstractCommand implements Command {
 

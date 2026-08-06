@@ -96,11 +96,14 @@
 
     <plugins>
       <!-- Measures how much of the code the tests actually execute.
-           Run "mvn clean test" then open target/site/jacoco/index.html -->
+           Run "./mvnw clean test" then open target/site/jacoco/index.html
+           0.8.15+ is required to read Java 25 bytecode (class file major
+           version 69); older releases fail with "Unsupported class file
+           major version". -->
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.12</version>
+        <version>0.8.15</version>
         <executions>
           <execution>
             <id>prepare-agent</id>

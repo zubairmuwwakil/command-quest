@@ -328,7 +328,7 @@ class AbstractCommandTest {
 
         captureOutput(() -> commands[0].run(folder, keystrokes("touch hello.txt")));
         captureOutput(() -> commands[1].run(folder, keystrokes("mkdir projects")));
-x
+
         assertTrue(folder.hasFile("hello.txt"));
         assertTrue(folder.hasSubFolder("projects"));
     }

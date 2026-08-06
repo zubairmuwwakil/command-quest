@@ -1,0 +1,24 @@
+# Maven build output
+target/
+
+# Maven wrapper: the jar is downloaded on first run, the scripts are committed
+.mvn/wrapper/maven-wrapper.jar
+
+# Eclipse - these describe one machine's setup, not the project
+.classpath
+.project
+.settings/
+
+# IntelliJ
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Worktrees created for isolated feature work
+.worktrees/
+.claude/worktrees/

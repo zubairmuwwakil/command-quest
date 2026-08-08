@@ -1,4 +1,4 @@
-package ca.zubairm.command_quest;
+package ca.zubairm.command_quest.hub;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,4 +1,6 @@
-package ca.zubairm.command_quest;
+package ca.zubairm.command_quest.commands;
+
+import ca.zubairm.command_quest.hub.Folder;
 
 //Inheritance for OOP 
 
@@ -10,6 +12,7 @@ public class TouchCommand extends AbstractCommand {
     		    "file",
     		    "\\w+\\.\\w+",
     		    """
+    		    
     		    To make a file, type the touch command.
     		    Next, type the name you want the file to have.
     		    Finally, type the file extension.

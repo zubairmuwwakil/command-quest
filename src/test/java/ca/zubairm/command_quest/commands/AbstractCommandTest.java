@@ -1,4 +1,4 @@
-package ca.zubairm.command_quest;
+package ca.zubairm.command_quest.commands;
 
 import static ca.zubairm.command_quest.TestSupport.captureOutput;
 import static ca.zubairm.command_quest.TestSupport.keystrokes;
@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Scanner;
+
+import ca.zubairm.command_quest.hub.Folder;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

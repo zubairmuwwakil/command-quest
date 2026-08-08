@@ -16,7 +16,7 @@ import java.util.Scanner;
  * what it printed. Both concerns live here so the individual tests stay short
  * and readable.
  */
-final class TestSupport {
+public final class TestSupport {
 
     private TestSupport() {
         // utility class - never instantiated
@@ -30,12 +30,12 @@ final class TestSupport {
      * Scanner rather than creating one over System.in, so a test can supply
      * keystrokes without a keyboard.
      */
-    static Scanner keystrokes(String... lines) {
+    public static Scanner keystrokes(String... lines) {
         return new Scanner(new StringReader(String.join("\n", lines) + "\n"));
     }
 
     /** Captures everything written to System.out while the given action runs. */
-    static String captureOutput(Runnable action) {
+    public static String captureOutput(Runnable action) {
         PrintStream original = System.out;
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         try {
@@ -59,7 +59,7 @@ final class TestSupport {
      * The script must end with "0" so the game exits; main() calls
      * scanner.nextLine() unguarded and would otherwise fail on end of input.
      */
-    static String runApp(String... lines) {
+    public static String runApp(String... lines) {
         InputStream originalIn = System.in;
         byte[] script = (String.join("\n", lines) + "\n").getBytes(StandardCharsets.UTF_8);
         try {

@@ -1,4 +1,4 @@
-package ca.zubairm.command_quest;
+package ca.zubairm.command_quest.hub;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

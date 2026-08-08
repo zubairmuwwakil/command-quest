@@ -334,4 +334,66 @@ class AbstractCommandTest {
         assertTrue(folder.hasFile("hello.txt"));
         assertTrue(folder.hasSubFolder("projects"));
     }
+
+    // ---------- execute(): the same algorithm as a pure function ----------
+    //
+    // run() is a conversation - it prints, reads, and loops until satisfied.
+    // execute() takes one line and returns what happened, printing nothing.
+    // These tests pin the returned value; the run() tests above stay until
+    // every caller has moved across.
+
+    @Test
+    @DisplayName("execute() creates the item and reports success")
+    void executeCreatesTheItem() {
+        Folder folder = new Folder("root");
+
+        CommandResult result = new TouchCommand().execute(folder, "touch cat.jpg");
+
+        assertTrue(result.created(), "a well-formed command on a free name creates");
+        assertEquals("File Successfully created!", result.output());
+        assertTrue(folder.hasFile("cat.jpg"), "the folder really changed");
+    }
+
+    @Test
+    @DisplayName("execute() rejects a malformed command and hands back the example")
+    void executeRejectsAMalformedCommand() {
+        Folder folder = new Folder("root");
+
+        CommandResult result = new TouchCommand().execute(folder, "touch nodot");
+
+        assertFalse(result.created());
+        assertFalse(result.finished(), "a rejection leaves the player retrying");
+        assertEquals("Not quite - the format was off.", result.output());
+        assertEquals("touch chicken.leg", result.hint(), "the hint is the command's own example");
+        assertTrue(folder.getFiles().isEmpty(), "nothing was created");
+    }
+
+    @Test
+    @DisplayName("execute() refuses a name that is already taken")
+    void executeRefusesADuplicateName() {
+        Folder folder = new Folder("root");
+        folder.addFile("cat.jpg");
+
+        CommandResult result = new TouchCommand().execute(folder, "touch cat.jpg");
+
+        assertFalse(result.created());
+        assertFalse(result.finished(), "the player should get another go");
+        assertTrue(result.output().contains("Your command format was correct"),
+                "the format praise is kept - the syntax lesson was learned");
+        assertTrue(result.output().contains("file already exists"));
+        assertEquals(1, folder.getFiles().size(), "no duplicate was added");
+    }
+
+    @Test
+    @DisplayName("execute() treats * as giving up, not as a bad command")
+    void executeTreatsStarAsCancelling() {
+        Folder folder = new Folder("root");
+
+        CommandResult result = new TouchCommand().execute(folder, "*");
+
+        assertFalse(result.created(), "nothing was made");
+        assertTrue(result.finished(), "cancelling ends the exchange, unlike a rejection");
+        assertEquals("Returning to the main menu...", result.output());
+        assertTrue(folder.getFiles().isEmpty());
+    }
 }

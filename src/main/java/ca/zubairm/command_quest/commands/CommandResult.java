@@ -18,21 +18,21 @@ public record CommandResult(Outcome outcome, String output, String hint) {
      * Three things can happen, and a boolean cannot express three things.
      *
      * The console loop needs REJECTED separated from the other two so it knows
-     * whether to keep prompting; the browser needs CREATED separated from the
+     * whether to keep prompting; the browser needs SUCCEEDED separated from the
      * other two so it knows whether to advance the lesson.
      */
     public enum Outcome {
-        /** The command was valid and the folder changed. */
-        CREATED,
+        /** The player typed the command correctly and it did its job. */
+        SUCCEEDED,
         /** The command was understood but not accepted; the player should retry. */
         REJECTED,
         /** The player typed "*" to give up on this lesson. */
         CANCELLED
     }
 
-    /** True when the folder actually changed - the signal that a lesson is passed. */
-    public boolean created() {
-        return outcome == Outcome.CREATED;
+    /** True when the player got it right - the signal that a lesson is passed. */
+    public boolean succeeded() {
+        return outcome == Outcome.SUCCEEDED;
     }
 
     /** True when there is no point prompting again, whether by success or by giving up. */

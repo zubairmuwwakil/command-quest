@@ -349,7 +349,7 @@ class AbstractCommandTest {
 
         CommandResult result = new TouchCommand().execute(folder, "touch cat.jpg");
 
-        assertTrue(result.created(), "a well-formed command on a free name creates");
+        assertTrue(result.succeeded(), "a well-formed command on a free name creates");
         assertEquals("File Successfully created!", result.output());
         assertTrue(folder.hasFile("cat.jpg"), "the folder really changed");
     }
@@ -361,7 +361,7 @@ class AbstractCommandTest {
 
         CommandResult result = new TouchCommand().execute(folder, "touch nodot");
 
-        assertFalse(result.created());
+        assertFalse(result.succeeded());
         assertFalse(result.finished(), "a rejection leaves the player retrying");
         assertEquals("Not quite - the format was off.", result.output());
         assertEquals("touch chicken.leg", result.hint(), "the hint is the command's own example");
@@ -376,7 +376,7 @@ class AbstractCommandTest {
 
         CommandResult result = new TouchCommand().execute(folder, "touch cat.jpg");
 
-        assertFalse(result.created());
+        assertFalse(result.succeeded());
         assertFalse(result.finished(), "the player should get another go");
         assertTrue(result.output().contains("Your command format was correct"),
                 "the format praise is kept - the syntax lesson was learned");
@@ -391,7 +391,7 @@ class AbstractCommandTest {
 
         CommandResult result = new TouchCommand().execute(folder, "*");
 
-        assertFalse(result.created(), "nothing was made");
+        assertFalse(result.succeeded(), "nothing was made");
         assertTrue(result.finished(), "cancelling ends the exchange, unlike a rejection");
         assertEquals("Returning to the main menu...", result.output());
         assertTrue(folder.getFiles().isEmpty());

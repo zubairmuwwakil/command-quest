@@ -13,12 +13,9 @@ public interface Command {
      * Handles one typed line and reports what happened, without printing or
      * reading anything.
      *
-     * Temporarily a default so run() and execute() can coexist while callers
-     * migrate. Once nothing calls run(), run() is deleted and this becomes the
-     * only method on the interface.
+     * This is the method the web layer calls. It is a pure function of the
+     * folder and the typed line, which is what lets a browser and a terminal
+     * share one set of rules.
      */
-    default CommandResult execute(Folder folder, String input) {
-        throw new UnsupportedOperationException(
-                getClass().getSimpleName() + " has not implemented execute() yet");
-    }
+    CommandResult execute(Folder folder, String input);
 }

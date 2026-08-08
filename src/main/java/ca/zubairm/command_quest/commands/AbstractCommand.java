@@ -46,7 +46,7 @@ public abstract class AbstractCommand implements Command {
 
             switch (result.outcome()) {
                 case CANCELLED -> System.out.println(result.output() + "\n");
-                case CREATED -> System.out.println("\n" + result.output() + "\n");
+                case SUCCEEDED -> System.out.println("\n" + result.output() + "\n");
                 case REJECTED -> {
                     System.out.println("\n" + result.output());
                     if (result.hint() != null) {
@@ -91,7 +91,7 @@ public abstract class AbstractCommand implements Command {
 
         create(folder, tokens[1]);
         return new CommandResult(
-                CommandResult.Outcome.CREATED,
+                CommandResult.Outcome.SUCCEEDED,
                 capitalize(noun) + " Successfully created!",
                 null);
     }

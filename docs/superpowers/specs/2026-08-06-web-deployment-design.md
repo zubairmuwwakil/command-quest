@@ -517,16 +517,30 @@ before Phase 2, or the port will be built against code that no longer exists.
 
 Each phase ends with a green test suite and a working application.
 
-| Phase | Work | Done when |
+| Phase | Work | Status |
 |---|---|---|
-| 0 | Repo hygiene: `.gitignore`, untrack `target/`, Maven wrapper | ✅ Complete (commits `ac9f72f`, `b9094b3`) |
-| 1 | Merge `main` into the branch; move tests into mirrored packages | Suite compiles, 86 tests green against the new structure |
-| 2 | Upgrade JUnit 5.11 → 6.x on its own | 86 tests green |
-| 3 | Domain refactor: `CommandResult`, `execute()`, rewrite `App` | Tests green, console app still runs with login and `cd` |
-| 4 | Spring Boot: controllers, DTOs, path resolution, validation, CORS | Endpoints answer `curl` locally |
-| 5 | Front end: profile gate, three panels, live file tree, breadcrumb | Playable against local API |
-| 6 | Dockerfile, deploy API and static site, wire CORS | Public URL works |
-| 7 | README with screenshot, live link, coverage note | Repo reads well |
+| 0 | Repo hygiene: `.gitignore`, untrack `target/`, Maven wrapper | ✅ `ac9f72f`, `b9094b3` |
+| 1 | Merge `main`; move tests into mirrored packages | ✅ `762c7e9`, `fa72939` — 66 green |
+| 2 | Upgrade JUnit 5.11 → 6.1.3 on its own | ✅ `71ba3a5` — no source changes needed |
+| 3 | Domain refactor: `CommandResult`, `execute()` | ✅ `a248eec`, `9f14289` — 81 green, `App` unchanged |
+| 4 | Spring Boot: controllers, DTOs, path resolution, validation, CORS | ✅ `3e92d1b` — 103 green, verified by `curl` |
+| 5 | Front end: profile gate, three panels, live file tree | ✅ `0f4e760` — verified in a real browser |
+| 6 | Dockerfile and deploy configuration | ✅ `886aba9` — **image unbuilt, no Docker daemon available** |
+| 7 | README and DEPLOY guide | ✅ `886aba9` |
+| — | **Deploy to Render and GitHub Pages** | ⬜ **Needs the owner's accounts** — see `DEPLOY.md` |
+
+Java 25 with Spring Boot 4.1 was the one risk held open in this spec. It is
+resolved: the project compiles and runs on Java 25 and the fallback to Java 21
+is not needed.
+
+Two findings during implementation that the spec had not anticipated:
+
+- `spring-boot-maven-plugin` must be *declared*, not merely inherited. Without
+  it `package` produced a 38 KB jar with no `Main-Class`, which would have
+  built a container that crash-looped on start.
+- Spring Boot 4 split the test slices into per-technology modules, so
+  `@WebMvcTest` needs a separate `spring-boot-webmvc-test` dependency and lives
+  in `org.springframework.boot.webmvc.test.autoconfigure`.
 
 Phases 1, 2, and 3 are separated on purpose. Merging a restructure, changing
 the test framework, and changing the code under test are three independent

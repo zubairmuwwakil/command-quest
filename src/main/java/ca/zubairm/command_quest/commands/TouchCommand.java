@@ -12,6 +12,7 @@ public class TouchCommand extends AbstractCommand {
     		    "file",
     		    "\\w+\\.\\w+",
     		    """
+    		    
     		    To make a file, type the touch command.
     		    Next, type the name you want the file to have.
     		    Finally, type the file extension.

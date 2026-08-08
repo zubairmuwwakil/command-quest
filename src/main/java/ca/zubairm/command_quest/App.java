@@ -80,6 +80,8 @@ public class App {
 				// abstraction complete
 				// complexity of how files are created are hidden
 				case 1:
+					
+					// 
 					makeFile.run(navigator.current(), scanner);
 					break;
 				case 2:

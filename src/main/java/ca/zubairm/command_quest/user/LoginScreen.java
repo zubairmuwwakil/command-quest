@@ -6,7 +6,7 @@ import java.util.Scanner;
  * The UI layer for accounts: prints the gate, reads input, validates the PIN
  * format, and asks UserManager to do the actual account work.
  *
- * Returns the User now using the app (a real account or a Guest), or null if
+ * Returns the User now using the App (a real account or a Guest), or null if
  * the user chose Exit.
  */
 public class LoginScreen {

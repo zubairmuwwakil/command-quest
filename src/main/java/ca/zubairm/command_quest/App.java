@@ -5,6 +5,7 @@ import java.util.Scanner;
 import ca.zubairm.command_quest.commands.Command;
 import ca.zubairm.command_quest.commands.MkDirCommand;
 import ca.zubairm.command_quest.commands.TouchCommand;
+import ca.zubairm.command_quest.commands.ViewCommand;
 import ca.zubairm.command_quest.hub.Folder;
 import ca.zubairm.command_quest.user.UserManager;
 import ca.zubairm.command_quest.user.LoginScreen;
@@ -18,8 +19,6 @@ public class App {
 
 		boolean running = true;
 
-		int operatingSystem = -1;
-
 		Folder currentFolder = new Folder("root");
 		
 		Navigator navigator = new Navigator(currentFolder);
@@ -28,6 +27,7 @@ public class App {
 		
 		Command makeFile = new TouchCommand();
 		Command makeFolder = new MkDirCommand();
+		Command viewFolder = new ViewCommand();
 
 		// work on more concrete examples of polymorphism in code
 		// check day 6 in teacher led
@@ -89,14 +89,70 @@ public class App {
 					break;
 					
 				case 4:
-					System.out.println("coming soon");
+					System.out.println("""
+
+							To move around, use the cd command:
+							cd <name>  ->  go into a subfolder
+							cd ..      ->  go up one level
+							cd /       ->  jump back to root
+
+							Type * to return to the main menu.
+							""");
+					System.out.print("Enter command: ");
+
+					while (true) {
+						String cmd = scanner.nextLine().trim();
+						if (cmd.equals("*")) {
+							System.out.println("Returning to the main menu...\n");
+							break;
+						}
+
+						String[] cdTokens = cmd.split("\\s+");
+						if (cdTokens.length < 2 || !cdTokens[0].equals("cd")) {
+							System.out.println("\nNot quite - try: cd <name>, cd .., or cd /");
+							System.out.print("Enter command: ");
+							continue;
+						}
+
+						String target = cdTokens[1];
+						boolean moved = false;
+
+						if (target.equals("..")) {
+							if (navigator.up()) moved = true;
+							else System.out.println("\nAlready at root.");
+						} else if (target.equals("/")) {
+							navigator.toRoot();
+							moved = true;
+						} else if (navigator.current().hasSubFolder(target)) {
+							navigator.into(navigator.current().getSubFolders().get(target));
+							moved = true;
+						} else {
+							System.out.println("\nNo folder named '" + target + "' here.");
+						}
+
+						if (moved) {
+							System.out.println("\nNow in: " + navigator.breadcrumb() + "\n");
+							break;
+						}
+						System.out.print("Enter command: ");
+					}
 					break;
 					
 				// view of current folder
 				case 3:
-					System.out.println("Current folder: " + navigator.current().getFiles());
-					System.out.println("Files: " + navigator.current().getSubFolders());
+					viewFolder.run(navigator.current(), scanner);
 					
+					break;
+				case 9:
+					System.out.println("Logging out...\n");
+					navigator.toRoot();
+					user = new LoginScreen(userManager).show(scanner);
+					if (user == null) {
+						System.out.println("Goodbye!");
+						running = false;
+						break;
+					}
+					System.out.println("Welcome, " + user.getUsername() + "!\n");
 					break;
 				case 0:
 					System.out.println("Goodbye!");

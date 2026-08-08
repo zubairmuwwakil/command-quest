@@ -43,29 +43,7 @@ public class App {
 				But for now lets get started!
 				""");
 
-		while (operatingSystem != 1 && operatingSystem != 2 && operatingSystem != 3) {
-			System.out.println("""
-					1) MacOS
-					2) Windows
-					3) Linux
-
-					""");
-
-			System.out.print("Enter choice: ");
-
-			// GET USERS OS SO COMMAND LINE DIRECTIONS ARE CORRECT
-			String choice = scanner.nextLine();
-
-			try {
-				operatingSystem = Integer.parseInt(choice.trim());
-			} catch (NumberFormatException e) {
-				System.out.println("\nPlease enter a valid number.");
-			}
-		}
-		
-		System.out.println("\nThanks! :) I hope you enjoy your journey into Command Quest ~\n");
-
-		
+	
 		// login gate - SRP: the gate logic now lives in LoginScreen
 				
 		UserManager userManager = new UserManager();

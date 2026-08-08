@@ -1,8 +1,10 @@
 package ca.zubairm.command_quest.hub;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Tracks WHERE you are in the folder tree using a navigation back-stack -
@@ -21,6 +23,54 @@ public class Navigator {
 
     public Navigator(Folder root) {
         path.push(root);   // root is the bottom of the stack, and starts as current
+    }
+
+    /**
+     * Rebuilds a Navigator standing at the given path, walking down from root.
+     *
+     * The web API is stateless: the browser sends the folder tree and a list of
+     * folder NAMES like ["photos", "2024"], and the server reconstructs the
+     * stack. Names rather than folders, for two reasons.
+     *
+     * A Navigator cannot be sent directly - Jackson discovers properties by the
+     * getX() convention, and none of the methods here match, so it serialises
+     * to "{}" and the location is silently lost with no error.
+     *
+     * And the stack holds references to nodes that also live inside the root
+     * tree. Serialising them by value would duplicate whole subtrees and
+     * deserialise into copies, so cd would move around a detached clone while
+     * touch modified the real tree.
+     *
+     * @throws IllegalArgumentException if any segment does not exist, rather
+     *         than quietly leaving the player somewhere they did not ask for
+     */
+    public static Navigator at(Folder root, List<String> pathNames) {
+        Navigator navigator = new Navigator(root);
+
+        for (String name : pathNames) {
+            Folder child = navigator.current().getSubFolders().get(name);
+            if (child == null) {
+                throw new IllegalArgumentException(
+                        "No folder named '" + name + "' under " + navigator.breadcrumb());
+            }
+            navigator.into(child);
+        }
+
+        return navigator;
+    }
+
+    /**
+     * The current location as a list of names below root - the inverse of at().
+     * Root itself is not included, so standing at root gives an empty list.
+     */
+    public List<String> pathNames() {
+        List<String> names = new ArrayList<>();
+        Iterator<Folder> it = path.descendingIterator();
+        it.next();   // skip root; the client only needs what is below it
+        while (it.hasNext()) {
+            names.add(it.next().getName());
+        }
+        return names;
     }
 
     // Where you are now = top of the stack.

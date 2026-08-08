@@ -3,17 +3,30 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <!-- The Spring Boot parent supplies dependency versions, plugin versions,
+       and - load-bearing here - the -parameters compiler flag. Jackson needs
+       constructor parameter names to deserialise Folder, which has a single
+       argument constructor and no no-arg constructor. Drop the parent and
+       Folder stops round-tripping in a way that looks unrelated to the change. -->
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>4.1.0</version>
+    <relativePath/>
+  </parent>
+
   <groupId>ca.zubairm</groupId>
   <artifactId>command-quest</artifactId>
   <version>0.0.1-SNAPSHOT</version>
 
   <name>command-quest</name>
-  <!-- FIXME change it to the project's website -->
-  <url>http://www.example.com</url>
+  <url>https://github.com/zubairmuwwakil/command-quest</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.release>25</maven.compiler.release>
+    <!-- The parent defaults java.version to 17 and derives
+         maven.compiler.release from it. 17 is a floor, not a ceiling. -->
+    <java.version>25</java.version>
   </properties>
 
   <dependencyManagement>
@@ -32,6 +45,36 @@
   </dependencyManagement>
 
   <dependencies>
+    <!-- Embedded Tomcat + Spring MVC + Jackson. This is what turns the domain
+         into an HTTP API; nothing in commands/ or hub/ depends on it. -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+
+    <!-- Bean Validation, so a malformed request becomes a 400 with a clean
+         message rather than a stack trace. The client supplies the folder
+         tree in this design, which makes it untrusted input. -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Spring Boot 4 split the test slices into per-technology modules, so
+         @WebMvcTest is no longer pulled in by spring-boot-starter-test. Without
+         this the annotation simply does not resolve. -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-webmvc-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>

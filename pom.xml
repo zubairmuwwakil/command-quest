@@ -141,6 +141,29 @@
     </pluginManagement>
 
     <plugins>
+      <!-- Repackages the jar so it carries its dependencies and a Main-Class.
+           The parent supplies this plugin's VERSION but does not run it -
+           inheriting a parent manages plugins, it does not activate them.
+           Without this declaration "package" produces a 38 KB jar with no
+           manifest entry and "java -jar" fails with "no main manifest
+           attribute".
+
+           mainClass is explicit because this jar has two: the console App and
+           the web application. Auto-detection fails when there is more than
+           one, which is the price of keeping both front ends alive.
+
+           The same jar still runs the console game, verified:
+             java -cp target/command-quest-0.0.1-SNAPSHOT.jar \
+                  -Dloader.main=ca.zubairm.command_quest.App \
+                  org.springframework.boot.loader.launch.PropertiesLauncher -->
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <mainClass>ca.zubairm.command_quest.web.CommandQuestApplication</mainClass>
+        </configuration>
+      </plugin>
+
       <!-- Measures how much of the code the tests actually execute.
            Run "./mvnw clean test" then open target/site/jacoco/index.html
            0.8.15+ is required to read Java 25 bytecode (class file major

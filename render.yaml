@@ -1,0 +1,21 @@
+# Render blueprint. With this committed, Render can create the service from the
+# repository instead of you filling in a form - and the settings are reviewable
+# in git rather than living in a dashboard nobody can diff.
+#
+# See DEPLOY.md for the steps that genuinely need a human.
+
+services:
+  - type: web
+    name: command-quest-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: oregon
+    branch: web-deploy
+    healthCheckPath: /api/health
+    envVars:
+      # Which origins the browser may call this API from. Set this to the
+      # GitHub Pages URL. A wildcard would let any site on the internet post
+      # folder trees here, which is needless when the caller is known.
+      - key: COMMANDQUEST_ALLOWED_ORIGINS
+        value: https://zubairmuwwakil.github.io

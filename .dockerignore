@@ -1,0 +1,17 @@
+# Everything here would be copied into the build context and then thrown away.
+# Excluding it makes builds faster and keeps local junk out of the image.
+
+target/
+.git/
+.github/
+.claude/
+docs/
+.mvn/wrapper/maven-wrapper.jar
+.classpath
+.project
+.settings/
+.idea/
+*.iml
+.vscode/
+.DS_Store
+README.md

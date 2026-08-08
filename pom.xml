@@ -18,10 +18,13 @@
 
   <dependencyManagement>
     <dependencies>
+      <!-- The BOM pins every junit-* artifact to one version, so the api,
+           params, and engine dependencies below need no <version> of their
+           own and cannot drift apart. -->
       <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
-        <version>5.11.0</version>
+        <version>6.1.3</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>

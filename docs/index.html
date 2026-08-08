@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Command Quest — learn the command line</title>
+<meta name="description" content="A small game that teaches command line basics: touch, mkdir, ls and cd.">
+<!-- Relative paths, not absolute: GitHub Pages serves project sites from a
+     subpath (/command-quest/), so a leading slash would 404. -->
+<link rel="stylesheet" href="./style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#128187;</text></svg>">
+</head>
+<body>
+
+<!-- ============ profile gate ============ -->
+<section id="gate" class="gate">
+  <div class="gate-card">
+    <h1 class="gate-title">Command&nbsp;Quest</h1>
+    <p class="gate-tagline">Learn the command line by using it.</p>
+
+    <div id="gate-choices" class="gate-choices">
+      <button class="btn btn-primary" data-gate="new">Make an account</button>
+      <button class="btn" data-gate="login">Log in</button>
+      <button class="btn btn-ghost" data-gate="guest">Continue as guest</button>
+    </div>
+
+    <form id="gate-form" class="gate-form" hidden autocomplete="off">
+      <h2 id="gate-form-title" class="gate-form-title">Make an account</h2>
+      <label class="field">
+        <span>Username</span>
+        <input id="gate-username" type="text" maxlength="20" required>
+      </label>
+      <label class="field">
+        <span>4-digit code</span>
+        <input id="gate-pin" type="text" inputmode="numeric" pattern="\d{4}" maxlength="4" required>
+      </label>
+      <p class="field-note">
+        Made up for this game only — it never leaves your browser.
+        Don't reuse a real PIN.
+      </p>
+      <p id="gate-error" class="gate-error" role="alert" hidden></p>
+      <div class="gate-actions">
+        <button type="submit" class="btn btn-primary">Continue</button>
+        <button type="button" class="btn btn-ghost" data-gate="back">Back</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- ============ game ============ -->
+<div id="game" class="app" hidden>
+
+  <header class="topbar">
+    <span class="topbar-brand">Command&nbsp;Quest</span>
+    <div class="progress" title="Lessons completed">
+      <span id="progress-dots" class="progress-dots"></span>
+      <span id="progress-label" class="progress-label">0/4</span>
+    </div>
+    <span class="topbar-right">
+      <span id="who" class="who"></span>
+      <button id="signout" class="btn btn-ghost btn-sm">Sign out</button>
+    </span>
+  </header>
+
+  <div id="status" class="status" hidden></div>
+
+  <main class="panels">
+
+    <!-- lesson -->
+    <section class="panel panel-lesson" aria-labelledby="lesson-title">
+      <h2 class="panel-head">Lesson</h2>
+      <nav id="lesson-tabs" class="tabs" aria-label="Choose a lesson"></nav>
+      <div class="panel-body">
+        <h3 id="lesson-title" class="lesson-title"></h3>
+        <p id="lesson-body" class="lesson-body"></p>
+        <p class="lesson-example">
+          Example: <code id="lesson-example"></code>
+        </p>
+      </div>
+    </section>
+
+    <!-- terminal -->
+    <section class="panel panel-terminal">
+      <h2 class="panel-head">Terminal</h2>
+      <div id="term" class="term" role="log" aria-live="polite" tabindex="0"></div>
+      <form id="term-form" class="term-form" autocomplete="off">
+        <span class="term-prompt" aria-hidden="true">$</span>
+        <input id="term-input" class="term-input" type="text" maxlength="200"
+               aria-label="Type a command" spellcheck="false" autocapitalize="off">
+        <button type="submit" class="btn btn-sm">Run</button>
+      </form>
+    </section>
+
+    <!-- files -->
+    <section class="panel panel-files">
+      <h2 class="panel-head">Files</h2>
+      <div class="panel-body">
+        <p class="breadcrumb"><code id="breadcrumb">root</code></p>
+        <ul id="tree" class="tree"></ul>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="./app.js"></script>
+</body>
+</html>

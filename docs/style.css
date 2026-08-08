@@ -1,0 +1,237 @@
+/* Command Quest - no framework, no build step.
+   One file, custom properties at the top, mobile handled by one media query. */
+
+:root {
+  --bg: #12141a;
+  --panel: #1a1d26;
+  --panel-2: #21242f;
+  --line: #2c3040;
+  --ink: #e6e8ef;
+  --ink-dim: #9aa0b4;
+  --accent: #7fd1a0;
+  --accent-dim: #3d6b52;
+  --warn: #f0a868;
+  --error: #f07878;
+  --folder: #8ab4f8;
+  --radius: 10px;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+/* The browser hides [hidden] via `display: none` in its own stylesheet, which
+   ANY author `display` rule outranks. Several elements here are both toggled
+   with `hidden` and given `display: grid/flex`, so without this they never
+   actually hide. One of the few honest uses of !important: restoring a default
+   that the layout rules below overrode by accident. */
+[hidden] { display: none !important; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+code { font-family: var(--mono); }
+
+/* ---------- buttons ---------- */
+
+.btn {
+  font: inherit;
+  padding: .55rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel-2);
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.btn:hover { border-color: var(--accent-dim); }
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn-primary { background: var(--accent); color: #10231a; border-color: var(--accent); font-weight: 600; }
+.btn-primary:hover { filter: brightness(1.08); }
+.btn-ghost { background: transparent; color: var(--ink-dim); }
+.btn-sm { padding: .3rem .6rem; font-size: .85rem; }
+
+/* ---------- profile gate ---------- */
+
+.gate {
+  display: grid;
+  place-items: center;
+  min-height: 100%;
+  padding: 1.5rem;
+}
+.gate-card {
+  width: min(26rem, 100%);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 2rem;
+}
+.gate-title { margin: 0; font-size: 1.9rem; letter-spacing: -.02em; }
+.gate-tagline { margin: .3rem 0 1.6rem; color: var(--ink-dim); }
+.gate-choices { display: grid; gap: .6rem; }
+.gate-form { display: grid; gap: .9rem; }
+.gate-form-title { margin: 0; font-size: 1.05rem; }
+.field { display: grid; gap: .3rem; font-size: .9rem; color: var(--ink-dim); }
+.field input {
+  font: inherit;
+  font-family: var(--mono);
+  padding: .55rem .7rem;
+  background: var(--bg);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.field input:focus { outline: none; border-color: var(--accent); }
+.field-note { margin: -.3rem 0 0; font-size: .8rem; color: var(--ink-dim); }
+.gate-error { margin: 0; color: var(--error); font-size: .9rem; }
+.gate-actions { display: flex; gap: .6rem; }
+
+/* ---------- app shell ---------- */
+
+.app { display: flex; flex-direction: column; height: 100%; }
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: .6rem 1rem;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+.topbar-brand { font-weight: 600; letter-spacing: -.01em; }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: .7rem; }
+.who { color: var(--ink-dim); font-size: .9rem; }
+
+.progress { display: flex; align-items: center; gap: .5rem; }
+.progress-dots { display: flex; gap: .3rem; }
+.dot { width: .55rem; height: .55rem; border-radius: 50%; background: var(--line); }
+.dot.on { background: var(--accent); }
+.progress-label { color: var(--ink-dim); font-size: .85rem; font-variant-numeric: tabular-nums; }
+
+.status {
+  padding: .5rem 1rem;
+  background: #2a2418;
+  color: var(--warn);
+  font-size: .9rem;
+  border-bottom: 1px solid var(--line);
+}
+.status.error { background: #2a1a1a; color: var(--error); }
+
+/* ---------- three panels ---------- */
+
+.panels {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(15rem, 1fr) minmax(20rem, 1.6fr) minmax(13rem, .9fr);
+  gap: 1px;
+  background: var(--line);
+  min-height: 0;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+  min-height: 0;
+  min-width: 0;
+}
+.panel-head {
+  margin: 0;
+  padding: .5rem 1rem;
+  font-size: .72rem;
+  text-transform: uppercase;
+  letter-spacing: .09em;
+  color: var(--ink-dim);
+  border-bottom: 1px solid var(--line);
+}
+.panel-body { padding: 1rem; overflow-y: auto; }
+
+/* lesson */
+.tabs { display: flex; flex-wrap: wrap; gap: .3rem; padding: .6rem 1rem 0; }
+.tab {
+  font: inherit;
+  font-size: .85rem;
+  font-family: var(--mono);
+  padding: .25rem .6rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-dim);
+  cursor: pointer;
+}
+.tab[aria-selected="true"] { background: var(--accent-dim); color: var(--ink); border-color: var(--accent-dim); }
+.tab.done::after { content: " ✓"; color: var(--accent); }
+.lesson-title { margin: 0 0 .5rem; font-size: 1.15rem; }
+.lesson-body { margin: 0 0 1rem; color: var(--ink-dim); }
+.lesson-example { margin: 0; font-size: .9rem; color: var(--ink-dim); }
+.lesson-example code { color: var(--accent); }
+
+/* terminal */
+.term {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  font-family: var(--mono);
+  font-size: .875rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.term-line { margin: 0 0 .35rem; }
+.term-echo { color: var(--ink); }
+.term-echo::before { content: "$ "; color: var(--accent); }
+.term-ok { color: var(--accent); }
+.term-no { color: var(--warn); }
+.term-hint { color: var(--ink-dim); }
+.term-form {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .6rem 1rem;
+  border-top: 1px solid var(--line);
+  background: var(--panel-2);
+}
+.term-prompt { color: var(--accent); font-family: var(--mono); }
+.term-input {
+  flex: 1;
+  font: inherit;
+  font-family: var(--mono);
+  background: transparent;
+  border: 0;
+  color: var(--ink);
+}
+.term-input:focus { outline: none; }
+
+/* files */
+.breadcrumb { margin: 0 0 .7rem; font-size: .85rem; color: var(--ink-dim); }
+.breadcrumb code { color: var(--folder); }
+.tree { list-style: none; margin: 0; padding: 0; font-family: var(--mono); font-size: .875rem; }
+.tree li { padding: .12rem 0; }
+.tree .is-folder { color: var(--folder); }
+.tree .is-empty { color: var(--ink-dim); font-style: italic; font-family: var(--sans); }
+.tree ul { list-style: none; margin: 0; padding-left: 1rem; }
+
+/* Briefly highlights whatever the last command changed - the moment that makes
+   an invisible CLI effect visible. */
+@keyframes flash { from { background: var(--accent-dim); } to { background: transparent; } }
+.tree .just-added { animation: flash 1.1s ease-out; border-radius: 4px; }
+
+/* ---------- narrow screens ---------- */
+
+@media (max-width: 860px) {
+  .panels { grid-template-columns: 1fr; }
+  .panel-terminal { order: -1; }
+  .term { min-height: 12rem; max-height: 45vh; }
+  .panel-body { max-height: 30vh; }
+  .topbar { flex-wrap: wrap; gap: .5rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tree .just-added { animation: none; }
+}

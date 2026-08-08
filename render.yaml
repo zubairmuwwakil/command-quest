@@ -6,12 +6,14 @@
 
 services:
   - type: web
-    name: command-quest-api
+    name: command-quest
     runtime: docker
     dockerfilePath: ./Dockerfile
     plan: free
     region: oregon
     branch: web-deploy
+    # Render polls this after each deploy. A failing health check surfaces a
+    # broken start as a failed deploy rather than as a silent, dead URL.
     healthCheckPath: /api/health
     envVars:
       # Which origins the browser may call this API from. Set this to the

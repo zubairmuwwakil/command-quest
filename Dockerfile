@@ -30,10 +30,16 @@ USER quest
 
 COPY --from=build --chown=quest:quest /build/target/*.jar app.jar
 
-# Render, Fly and friends inject the port to listen on. Defaulting to 8080
-# keeps "docker run -p 8080:8080" working locally with no arguments.
-ENV PORT=8080
-EXPOSE 8080
+# Render injects PORT at runtime and defaults it to 10000, and it also inspects
+# EXPOSE to work out where to send traffic. These two must agree.
+#
+# They did not, in the first deploy: EXPOSE said 8080 while the injected PORT
+# made the app bind 10000. TLS completed and then nothing came back - the
+# router was forwarding to a port with nothing on it. Silence after a
+# successful handshake is what a routing/binding mismatch looks like, as
+# opposed to the 502 you get from a crashed process.
+ENV PORT=10000
+EXPOSE 10000
 
 # Containers get a slice of the host, not the whole machine. Without this the
 # JVM can size its heap against the host's total RAM and get OOM-killed on a
@@ -41,4 +47,9 @@ EXPOSE 8080
 ENV JAVA_OPTS="-XX:MaxRAMPercentage=75 -XX:+UseSerialGC -XX:TieredStopAtLevel=1"
 
 # Shell form on purpose, so $PORT and $JAVA_OPTS are expanded at runtime.
-ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -Dserver.port=$PORT -jar app.jar"]
+#
+# server.address is pinned to 0.0.0.0 because Render requires it: a server bound
+# only to localhost inside a container is unreachable from outside it. Spring
+# Boot already defaults to all interfaces, but stating it means the requirement
+# is visible rather than depending on a default staying put.
+ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -Dserver.address=0.0.0.0 -Dserver.port=$PORT -jar app.jar"]

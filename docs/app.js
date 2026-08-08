@@ -19,7 +19,7 @@
   const API = window.CQ_API || (
     ['localhost', '127.0.0.1'].includes(location.hostname)
       ? 'http://localhost:8080'
-      : 'https://command-quest-api.onrender.com'
+      : 'https://command-quest-abxo.onrender.com'
   );
 
   const SEED = { name: 'root', files: ['todo.md', 'notes.txt'], subFolders: {} };

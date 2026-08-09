@@ -11,7 +11,7 @@ services:
     dockerfilePath: ./Dockerfile
     plan: free
     region: oregon
-    branch: web-deploy
+    branch: main
     # Render polls this after each deploy. A failing health check surfaces a
     # broken start as a failed deploy rather than as a silent, dead URL.
     healthCheckPath: /api/health

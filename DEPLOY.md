@@ -29,7 +29,7 @@ Both steps need an account, so they cannot be scripted from here.
 ### 1. Deploy the API to Render
 
 1. Sign in at <https://render.com> with your GitHub account.
-2. **New → Blueprint**, pick `zubairmuwwakil/command-quest`, branch `web-deploy`.
+2. **New → Blueprint**, pick `zubairmuwwakil/command-quest`, branch `main`.
    Render reads `render.yaml` and fills in the rest.
 3. Deploy, and wait for the first build. It takes a few minutes — the Docker
    layer cache is cold and Maven downloads the dependency tree once.
@@ -43,7 +43,7 @@ Dockerfile is not Render-specific; only `render.yaml` is.
 ### 2. Publish the front end to GitHub Pages
 
 1. In the repository: **Settings → Pages**.
-2. Source: **Deploy from a branch**. Branch: `web-deploy`, folder: `/docs`.
+2. Source: **Deploy from a branch**. Branch: `main`, folder: `/docs`.
 3. Save. The site appears at
    `https://zubairmuwwakil.github.io/command-quest/` within a minute or two.
 

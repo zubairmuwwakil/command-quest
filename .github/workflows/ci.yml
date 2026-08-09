@@ -47,6 +47,41 @@ jobs:
             exit 1
           fi
 
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # The front end has no package.json and no node_modules - node:test and
+      # node:assert are standard library.
+      #
+      # An explicit glob, not a bare `node --test`, which walks the whole tree
+      # and would descend into target/ once Maven has run. And not
+      # `node --test test/`: a bare directory is resolved as a module entry
+      # point rather than scanned, so it fails with MODULE_NOT_FOUND.
+      #
+      # Two reporters at once: spec to the console because a human reads it,
+      # tap to a file because the next step parses it and TAP's summary format
+      # is documented where the console one is not. Writing the file directly
+      # also avoids piping through tee, whose exit status would mask a failure.
+      - name: Test the front end
+        run: |
+          node --test \
+            --test-reporter=spec --test-reporter-destination=stdout \
+            --test-reporter=tap  --test-reporter-destination=js-tests.log \
+            test/*.test.js
+
+      # The surefire guard above cannot see JavaScript, so a test.skip() in
+      # boot.test.js would slip through the exact hole it exists to close.
+      - name: Fail if any front-end test was skipped
+        run: |
+          skipped=$(grep -oE '^# skipped [0-9]+' js-tests.log | grep -oE '[0-9]+$' || echo 0)
+          echo "Skipped front-end tests: $skipped"
+          if [ "$skipped" -ne 0 ]; then
+            echo "::error::$skipped front-end test(s) skipped. Delete them or fix them - do not disable them."
+            exit 1
+          fi
+
       - name: Upload coverage report
         if: always()
         uses: actions/upload-artifact@v4

@@ -5,8 +5,9 @@ The front end and the API are hosted separately, on purpose.
 Free container plans put the service to sleep after about fifteen minutes idle
 and take tens of seconds to wake. If the same server delivered the HTML, a
 visitor would sit in front of a blank page for that whole time. Serving the page
-from a CDN makes the first paint instant, and the page quietly warms the API in
-the background while the player reads the first lesson.
+from a CDN makes the first paint instant, and `docs/boot.js` wakes the API in
+the background, showing the player what it is waiting for and filling the
+lessons in whenever they arrive.
 
 ```
   Browser ──▶ GitHub Pages        index.html, app.js, style.css   (instant, free)
@@ -97,12 +98,49 @@ already allows port 5500.
 
 ## The cold start, honestly
 
-The warm-up ping hides the delay when a player reads the lesson before typing.
-It does not hide it from someone who lands and immediately types. If that
-matters — a live demo, an interviewer clicking the link — the options are a
-paid instance (about $7/month) or an external uptime pinger hitting
-`/api/health` every ten minutes.
+The delay is still there. `docs/boot.js` does not remove it — it makes it
+legible, which is a different and smaller claim than this file used to make.
+
+An earlier version said a warm-up ping "hides the delay". It did not. The ping
+was fired and forgotten, nothing observed its result, and the page went on
+looking finished and inert while the container booted. The one message that
+would have explained the wait was written into an element inside a hidden
+parent, so it never rendered once. A visitor's only way to learn the server had
+woken was to reload and see.
+
+What happens now, on a cold URL:
+
+1. The gate paints immediately. Making an account or logging in works straight
+   away — accounts are `localStorage` and never touch the server.
+2. After 800ms, if the API has not answered, a boot panel appears under the
+   buttons: the stage being attempted, a tick mark per stage completed, and an
+   elapsed counter.
+3. Each request carries a 15-second deadline of its own. Render holds
+   connections to a sleeping container open rather than refusing them, so a
+   plain `fetch` would hang rather than fail, and nothing would ever advance.
+   Failed attempts back off — one second, two, four, six, then eight.
+4. When the lessons arrive they are filled in wherever the player has got to,
+   including into a game they already entered. Nobody reloads.
+5. After ninety seconds — roughly three times a typical wake — it stops and
+   says the API may be down rather than asleep, and offers **Try again**.
+
+If the wait itself matters, and for a live demo or an interviewer clicking the
+link it might, the options remain a paid instance (about $7/month) or an
+external uptime pinger hitting `/api/health` every ten minutes.
 
 An uptime pinger on a free plan is worth thinking about rather than doing
 reflexively: it keeps a container running continuously to serve nobody, and
 some providers consider that abuse of a free tier.
+
+### Checking the boot screen by hand
+
+The retry engine is covered by `test/boot.test.js` (`node --test test/*.test.js`),
+which drives it with a fake clock so the ninety-second deadline is asserted in
+under a millisecond. The parts that need a browser are these:
+
+| Path | How |
+|---|---|
+| Cold start | Leave the service idle 15+ minutes, then load the page |
+| Warm start | Reload at once — the panel must **not** flash |
+| Failure and retry | Run `window.CQ_API = 'https://example.invalid'` before the scripts, reload, wait 90s |
+| Late arrival | Throttle to Slow 3G, choose *Continue as guest* immediately — the lesson panel must fill in without a reload |

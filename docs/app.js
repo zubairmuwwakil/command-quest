@@ -117,7 +117,8 @@
     $('who').textContent = user === GUEST ? 'guest' : user;
 
     $('term').innerHTML = '';
-    print('Welcome to Command Quest. Pick a lesson, then type the command.', 'term-hint');
+    print('Welcome to Command Quest. Type any command you like — '
+        + 'help lists them, and the lessons on the left are there whenever you want them.', 'term-hint');
 
     renderLessonTabs();
     if (lessonIds.length) selectLesson(state.lessonId);
@@ -154,7 +155,7 @@
       dot.className = 'dot' + (state.done.includes(id) ? ' on' : '');
       return dot;
     }));
-    $('progress-label').textContent = `${state.done.length}/${lessonIds.length || 4}`;
+    $('progress-label').textContent = `${state.done.length}/${lessonIds.length || 5}`;
   }
 
   function selectLesson(id) {
@@ -220,11 +221,42 @@
     $('term').scrollTop = $('term').scrollHeight;
   }
 
+  /*
+   * Typed lines, newest last, with a cursor that walks back through them.
+   *
+   * Deliberately not persisted and not shared between accounts: it is a
+   * convenience for the session you are in, and writing every command a player
+   * ever typed into localStorage would outlive the reason for keeping it.
+   */
+  let history = [];
+  let historyAt = 0;   // === history.length means "at the live, unsent line"
+
+  $('term-input').addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
+    if (!history.length) return;
+
+    // Stop the caret jumping to the ends of the line, which is what these keys
+    // do in a text input by default and would fight the recall.
+    e.preventDefault();
+
+    historyAt = e.key === 'ArrowUp'
+      ? Math.max(0, historyAt - 1)
+      : Math.min(history.length, historyAt + 1);
+
+    e.target.value = history[historyAt] ?? '';
+    e.target.setSelectionRange(e.target.value.length, e.target.value.length);
+  });
+
   $('term-form').addEventListener('submit', (e) => {
     e.preventDefault();
     const input = $('term-input');
     const typed = input.value.trim();
     if (!typed) return;
+
+    // Skip an immediate repeat: holding a command down to retry it should not
+    // bury the rest of the history under copies of itself.
+    if (history[history.length - 1] !== typed) history.push(typed);
+    historyAt = history.length;
     input.value = '';
     print(typed, 'term-echo');
     send(typed);
@@ -307,8 +339,10 @@
       const res = await fetch(`${API}/api/command`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        // No lessonId. The server dispatches on the first word of the command,
+        // so there is nothing to tell it about which lesson is on screen - and
+        // nothing it could use to refuse a command the player has not "reached".
         body: JSON.stringify({
-          lessonId: state.lessonId,
           command: typed,
           path: state.path,
           state: state.tree
@@ -332,10 +366,21 @@
       state.tree = data.state;
       state.path = data.path || [];
 
-      if (data.correct && !state.done.includes(state.lessonId)) {
-        state.done.push(state.lessonId);
+      // Credit the command that ran, not the tab that happened to be open.
+      // Succeeding at mkdir used to tick off whichever lesson was showing,
+      // so progress recorded what you had selected rather than what you did.
+      const ran = data.commandId;
+
+      if (data.correct && lessons[ran] && !state.done.includes(ran)) {
+        state.done.push(ran);
         renderLessonTabs();
       }
+
+      // Follow the player. Reading touch and typing mkdir now moves the panel
+      // to mkdir rather than refusing the command - and it follows on failure
+      // too, which is the case that earns this: "mkdir" with no name showing
+      // the mkdir lesson is the moment that lesson is worth reading.
+      if (lessons[ran] && ran !== state.lessonId) selectLesson(ran);
 
       renderTree(data.correct ? target : undefined);
       persist();

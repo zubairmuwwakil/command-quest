@@ -1,25 +1,25 @@
 # Command Quest
 
+[![CI](https://github.com/zubairmuwwakil/command-quest/actions/workflows/ci.yml/badge.svg)](https://github.com/zubairmuwwakil/command-quest/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
+[![Java 25](https://img.shields.io/badge/java-25-orange.svg)](./pom.xml)
+
 A small game that teaches command line basics — `touch`, `mkdir`, `ls`, `cd` —
 by making you type them. It runs in a browser and in a terminal, from one
 codebase.
 
-```
-┌─ LESSON ─────┐┌─ TERMINAL ───────┐┌─ FILES ───┐
-│ Make a file  ││ $ touch cat.jpg  ││ root/     │
-│              ││ ✓ Created!       ││  todo.md  │
-│ Type touch,  ││                  ││  notes.txt│
-│ then a name, ││ $ mkdir photos   ││  cat.jpg ←│
-│ then .ext    ││ ✓ Created!       ││  photos/ ←│
-│              ││ $ █              ││           │
-└──────────────┘└──────────────────┘└───────────┘
-```
+**Live:** <https://commandquest.zubairmuwwakil.com>
+
+![Command Quest: a lesson panel, a terminal, and a file tree that updates as commands succeed](docs/screenshot.png)
 
 The file tree on the right updates the instant a command succeeds. That is the
 whole idea: a command line changes things you cannot see, and beginners lose the
 thread because nothing visibly happens. Here it does.
 
 ## Running it
+
+**Prerequisites:** JDK 25 and Python 3 (only to serve the static front end).
+Maven is not needed — the wrapper downloads it.
 
 **In a terminal**
 
@@ -38,7 +38,9 @@ java -cp target/classes ca.zubairm.command_quest.App
 cd docs && python3 -m http.server 5500
 ```
 
-Then open <http://localhost:5500>.
+Then open <http://localhost:5500>. The page talks to `localhost:8080`
+automatically when served from localhost; set `window.CQ_API` to point it
+anywhere else.
 
 ## How it is put together
 
@@ -102,12 +104,19 @@ Knowing where an abstraction does not fit is part of the design.
 ./mvnw clean test
 ```
 
-103 tests. Coverage report at `target/site/jacoco/index.html`.
+122 tests, none skipped. Line coverage 93.1%; the report lands at
+`target/site/jacoco/index.html`.
 
 The domain is tested without any Spring context, the web layer with `@WebMvcTest`
 slices, and there is a round-trip test for the folder tree specifically — in a
 stateless design a serialisation bug silently deletes a player's work instead of
 throwing, so it is worth a test of its own.
+
+`clean` is not decoration. Surefire runs whatever `*Test.class` it finds in
+`target/test-classes`, including classes whose source has since moved, so a
+plain `test` can report tests that no longer exist. CI asserts the skip count
+is zero for the same reason: this suite once reported 103 tests while quietly
+skipping 17 of them behind a green build.
 
 ## Deploying
 
@@ -123,8 +132,16 @@ Java 25 · Spring Boot 4.1 · JUnit 6 · Maven · Docker · vanilla JS
 
 | Branch | |
 |---|---|
-| `individual-project` | the console version, as submitted for coursework |
-| `main` | trunk |
-| `web-deploy` | the web port |
+| `main` | trunk — the console game, the web port, and what deploys |
+| `individual-project` | the console version, frozen as submitted for coursework |
 
 Tag `v1.0-submission` marks the coursework state.
+
+## Status
+
+Feature-complete and deployed, as of August 2026. Not under active development;
+issues and pull requests are still read.
+
+## License
+
+MIT — see [LICENSE](LICENSE).

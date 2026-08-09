@@ -22,3 +22,9 @@ target/
 # Worktrees created for isolated feature work
 .worktrees/
 .claude/worktrees/
+
+# Local agent settings - machine-specific, not part of the project
+.claude/
+
+# Playwright MCP scratch output
+.playwright-mcp/

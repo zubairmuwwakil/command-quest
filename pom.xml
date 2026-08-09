@@ -17,7 +17,10 @@
 
   <groupId>ca.zubairm</groupId>
   <artifactId>command-quest</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <!-- Released, not in progress. A -SNAPSHOT on a finished project reads as
+       abandoned rather than stable. The Dockerfile copies target/*.jar by
+       glob, so the version is free to move. -->
+  <version>1.0.0</version>
 
   <name>command-quest</name>
   <url>https://github.com/zubairmuwwakil/command-quest</url>

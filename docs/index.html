@@ -44,6 +44,29 @@
         <button type="button" class="btn btn-ghost" data-gate="back">Back</button>
       </div>
     </form>
+
+    <!-- Shown only if the API has not answered within 800ms, so a warm server
+         never flashes a "waking" panel at anyone. The buttons above stay live
+         throughout: accounts live in localStorage and need no server at all.
+
+         aria-live sits on the step list rather than the panel. Wrapping the
+         whole panel would include the elapsed counter, and a screen reader
+         would then announce a new number every second for up to ninety. -->
+    <div id="boot" class="boot" hidden>
+      <div class="boot-head">
+        <span id="boot-title" class="boot-title">waking server</span>
+        <span id="boot-elapsed" class="boot-elapsed" aria-hidden="true">0s</span>
+      </div>
+      <ol id="boot-steps" class="boot-steps" role="status" aria-live="polite">
+        <li data-step="contact">contacting api</li>
+        <li data-step="lessons">loading lessons</li>
+      </ol>
+      <p id="boot-note" class="boot-note">
+        Free plan — the server sleeps when idle. The first visit takes about
+        30 seconds.
+      </p>
+      <button id="boot-retry" class="btn btn-sm" hidden>Try again</button>
+    </div>
   </div>
 </section>
 
@@ -103,6 +126,8 @@
   </main>
 </div>
 
+<!-- boot.js first: it resolves the API address that app.js reads. -->
+<script src="./boot.js"></script>
 <script src="./app.js"></script>
 </body>
 </html>

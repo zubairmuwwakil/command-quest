@@ -93,6 +93,63 @@ code { font-family: var(--mono); }
 .gate-error { margin: 0; color: var(--error); font-size: .9rem; }
 .gate-actions { display: flex; gap: .6rem; }
 
+/* ---------- boot panel ---------- */
+/*
+ * Shown inside the gate card while the API container wakes. Styled as a
+ * terminal boot sequence, which suits the subject and - more usefully - lets
+ * each line stand for a real network call rather than for decoration.
+ */
+.boot {
+  margin-top: 1.5rem;
+  padding: .7rem .8rem;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  font-family: var(--mono);
+  font-size: .82rem;
+}
+.boot.is-failed { border-color: var(--error); }
+
+.boot-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--ink-dim);
+  margin-bottom: .5rem;
+}
+.boot-elapsed { font-variant-numeric: tabular-nums; }
+
+.boot-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: .25rem; }
+.boot-steps li { color: var(--ink-dim); }
+.boot-steps li::before { content: '·'; display: inline-block; width: 1.3em; }
+
+.boot-steps li.is-active { color: var(--ink); }
+.boot-steps li.is-active::before { content: '▸'; }
+.boot-steps li.is-active::after {
+  content: '█';
+  margin-left: .15em;
+  animation: cq-blink 1.1s step-end infinite;
+}
+.boot-steps li.is-done::before { content: '✓'; color: var(--accent); }
+.boot-steps li.is-failed { color: var(--error); }
+.boot-steps li.is-failed::before { content: '✗'; color: var(--error); }
+
+.boot-note {
+  margin: .65rem 0 0;
+  font-family: var(--sans);
+  font-size: .78rem;
+  color: var(--ink-dim);
+}
+#boot-retry { margin-top: .7rem; }
+
+@keyframes cq-blink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
+
+/* A cursor blinking for up to ninety seconds is exactly what this setting is
+   asking us not to do. The mark and the counter still convey the state. */
+@media (prefers-reduced-motion: reduce) {
+  .boot-steps li.is-active::after { animation: none; }
+}
+
 /* ---------- app shell ---------- */
 
 .app { display: flex; flex-direction: column; height: 100%; }

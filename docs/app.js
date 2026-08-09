@@ -14,13 +14,9 @@
 
   // ---------------------------------------------------------------- config
 
-  // Same-origin during local development; the deployed API otherwise. Set
-  // window.CQ_API before this script to point somewhere else.
-  const API = window.CQ_API || (
-    ['localhost', '127.0.0.1'].includes(location.hostname)
-      ? 'http://localhost:8080'
-      : 'https://command-quest-1.onrender.com'
-  );
+  // Resolved by boot.js, which loads first and needs the address before this
+  // file does. Set window.CQ_API before either script to point somewhere else.
+  const API = window.CQBoot.API;
 
   const SEED = { name: 'root', files: ['todo.md', 'notes.txt'], subFolders: {} };
   const GUEST = '__guest__';
@@ -124,7 +120,8 @@
     print('Welcome to Command Quest. Pick a lesson, then type the command.', 'term-hint');
 
     renderLessonTabs();
-    selectLesson(state.lessonId);
+    if (lessonIds.length) selectLesson(state.lessonId);
+    else awaitLessons();
     renderTree();
     $('term-input').focus();
   }
@@ -171,6 +168,46 @@
     renderLessonTabs();
     $('term-input').focus();
     persist();
+  }
+
+  /*
+   * A player can choose "Continue as guest" three seconds in and arrive here
+   * before the lessons have loaded. Say so, and take the terminal away while
+   * it is true: an enabled box invites a command, and that command would post
+   * to a container still booting and hang with no explanation - the original
+   * complaint, one screen further in.
+   */
+  function awaitLessons() {
+    $('lesson-title').textContent = 'Waiting for the server';
+    $('lesson-body').textContent =
+      'Lessons will appear here the moment it answers. Nothing to do — the page is still trying.';
+    $('lesson-example').textContent = '';
+    setTerminalEnabled(false);
+  }
+
+  function setTerminalEnabled(on) {
+    $('term-input').disabled = !on;
+    $('term-input').placeholder = on ? '' : 'waiting for the server…';
+    $('term-form').querySelector('button[type="submit"]').disabled = !on;
+  }
+
+  /*
+   * Called by boot.js when the API finally answers. If the player is still at
+   * the gate there is nothing on screen to correct; if they have already gone
+   * through, the empty lesson panel and tab strip fill in beneath them. Either
+   * way nobody reloads to find out the server woke up.
+   */
+  function lessonsArrived(loaded) {
+    lessons = loaded;
+    lessonIds = Object.keys(loaded);
+    if (!state) return;
+
+    // A saved profile can name a lesson this build no longer ships.
+    if (!lessons[state.lessonId]) state.lessonId = lessonIds[0];
+
+    setTerminalEnabled(true);
+    renderLessonTabs();
+    selectLesson(state.lessonId);
   }
 
   // ---------------------------------------------------------------- terminal
@@ -312,20 +349,12 @@
 
   // ---------------------------------------------------------------- boot
 
-  async function boot() {
-    // Fire and forget: this starts a sleeping container warming up while the
-    // player is still reading, so the first real command does not stall.
-    fetch(`${API}/api/health`).catch(() => {});
-
-    try {
-      const res = await fetch(`${API}/api/lessons`);
-      lessons = await res.json();
-      lessonIds = Object.keys(lessons);
-    } catch {
-      status('Cannot reach the server, so lessons could not load. Refresh to retry.', true);
-    }
-
+  function boot() {
+    // The gate first, because it works without the server - accounts are
+    // local. Then boot.js wakes the API and calls back when the lessons land,
+    // however long that takes and wherever the player has got to by then.
     showGate();
+    window.CQBoot.start(lessonsArrived);
   }
 
   boot();

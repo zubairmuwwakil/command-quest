@@ -1,203 +1,137 @@
 package ca.zubairm.command_quest;
 
 import static ca.zubairm.command_quest.TestSupport.runApp;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 
 /**
- * End-to-end tests for App.main() - the menu loop that ties everything
- * together.
+ * End-to-end tests for App.main() - the login gate plus the menu loop that ties
+ * the whole game together.
  *
- * Each test scripts a full session: an operating-system choice, some menu
- * selections, and finally "0" to quit.
+ * runApp(...) feeds the given lines as if the user typed each one and pressed
+ * Enter, then returns everything the game printed. Each test just checks the
+ * output contains the message we expect.
  *
- * DISABLED on the web-deploy branch: these tests describe the app as it was at
- * b9094b3, and main has since changed the flow underneath them.
- *
- *   - The operating-system prompt was deleted in bf2cf86, so the six tests for
- *     it assert on a feature that no longer exists.
- *   - Menu option 4 is now cd and option 5 was removed, so "coming soon" is
- *     never printed.
- *   - Listing moved into ViewCommand, which prints "Files in the current
- *     folder:" and no longer suffixes folders with "/", so every listing
- *     assertion targets replaced output. It also reads its own input line, so
- *     the scripts need an extra "ls".
- *   - App now opens with a login gate, so every script needs a leading "3"
- *     (Continue as Guest) before it reaches the menu.
- *
- * These are not failures of the code - the code moved on and the tests did not
- * follow. Reviving them means rewriting them against the current flow, which is
- * a deliberate decision rather than a mechanical fix. The 66 domain tests in
- * commands/ and hub/ are unaffected and remain the safety net for the
- * execute(Folder, String) refactor.
+ * The flow is:
+ *   login gate  -> 1 Make Account | 2 Login | 3 Continue as Guest | 0 Exit
+ *   main menu   -> 1 file | 2 folder | 3 view | 4 cd | 9 logout | 0 exit
+ * Most scripts log in as a guest ("3") and then leave the menu ("0").
  */
-@Disabled("Describes the pre-bf2cf86 console flow; see the class comment above")
 @DisplayName("App")
 class AppTest {
 
-    // ---------- startup and the operating system prompt ----------
+    // ---------- startup and the login gate ----------
 
     @Test
     @DisplayName("greets the player on startup")
     void printsTheWelcomeMessage() {
-        String output = runApp("1", "0");
-
+        String output = runApp("3", "0");   // guest in, then exit
         assertTrue(output.contains("Welcome to Command Quest!"));
     }
 
-    @ParameterizedTest(name = "accepts operating system choice {0}")
-    @ValueSource(strings = { "1", "2", "3" })
-    @DisplayName("accepts each of the three offered operating systems")
-    void acceptsEveryValidOperatingSystem(String choice) {
-        String output = runApp(choice, "0");
-
-        assertTrue(output.contains("Thanks! :) I hope you enjoy your journey"));
+    @Test
+    @DisplayName("lets a guest straight in")
+    void guestCanContinue() {
+        String output = runApp("3", "0");
+        assertTrue(output.contains("Welcome, Guest!"));
     }
 
     @Test
-    @DisplayName("re-prompts when the operating system is not a number")
-    void rejectsNonNumericOperatingSystem() {
-        String output = runApp("banana", "1", "0");
-
-        assertTrue(output.contains("Please enter a valid number."));
-        assertTrue(output.contains("Thanks! :) I hope you enjoy your journey"), "should continue after the retry");
+    @DisplayName("creates a new account from a username and 4-digit PIN")
+    void registersANewUser() {
+        // 1 = Make Account, then the username, then the PIN, then exit the menu.
+        String output = runApp("1", "bob", "1234", "0");
+        assertTrue(output.contains("Account created! You're logged in."));
+        assertTrue(output.contains("Welcome, bob!"));
     }
 
     @Test
-    @DisplayName("re-prompts when the operating system is out of range")
-    void rejectsOutOfRangeOperatingSystem() {
-        String output = runApp("9", "1", "0");
-
-        // 9 parses fine, so no error text - the loop simply asks again.
-        assertFalse(output.contains("Please enter a valid number."));
-        assertTrue(output.contains("Thanks! :) I hope you enjoy your journey"));
+    @DisplayName("rejects a PIN that is not 4 digits")
+    void rejectsABadPin() {
+        // "12" is too short - the gate refuses it, then we exit.
+        String output = runApp("1", "bob", "12", "0");
+        assertTrue(output.contains("PIN must be exactly 4 digits."));
     }
 
     @Test
-    @DisplayName("tolerates whitespace around the operating system choice")
-    void trimsTheOperatingSystemChoice() {
-        String output = runApp("  1  ", "0");
+    @DisplayName("denies login when the account does not exist")
+    void deniesAWrongLogin() {
+        // 2 = Login, for a user that was never created -> access denied.
+        String output = runApp("2", "ghost", "0000", "0");
+        assertTrue(output.contains("Access denied"));
+    }
 
-        assertTrue(output.contains("Thanks! :) I hope you enjoy your journey"));
+    @Test
+    @DisplayName("says goodbye when Exit is chosen at the gate")
+    void exitsFromTheGate() {
+        String output = runApp("0");
+        assertTrue(output.contains("Goodbye!"));
     }
 
     // ---------- the main menu ----------
 
     @Test
-    @DisplayName("says goodbye and stops on option 0")
+    @DisplayName("says goodbye and stops on menu option 0")
     void exitsOnZero() {
-        String output = runApp("1", "0");
-
+        String output = runApp("3", "0");
         assertTrue(output.contains("Goodbye!"));
     }
 
     @Test
-    @DisplayName("reports an unrecognised menu number")
+    @DisplayName("reports an unknown menu number")
     void rejectsUnknownMenuOption() {
-        String output = runApp("1", "42", "0");
-
+        String output = runApp("3", "42", "0");
         assertTrue(output.contains("Unknown option."));
     }
 
     @Test
-    @DisplayName("reports non-numeric menu input")
-    void rejectsNonNumericMenuOption() {
-        String output = runApp("1", "banana", "0");
-
+    @DisplayName("reports non-numeric menu input instead of crashing")
+    void rejectsNonNumericMenuInput() {
+        String output = runApp("3", "banana", "0");
         assertTrue(output.contains("Please enter a number."));
     }
 
     @Test
-    @DisplayName("keeps running after a bad menu entry")
-    void survivesABadMenuEntry() {
-        String output = runApp("1", "banana", "99", "0");
-
-        assertTrue(output.contains("Please enter a number."));
-        assertTrue(output.contains("Unknown option."));
-        assertTrue(output.contains("Goodbye!"), "should still reach a clean exit");
+    @DisplayName("logs out and returns to the login gate")
+    void logoutReturnsToTheGate() {
+        // guest -> logout (9) -> guest again -> exit
+        String output = runApp("3", "9", "3", "0");
+        assertTrue(output.contains("Logging out..."));
     }
 
-    @ParameterizedTest(name = "option {0} is not built yet")
-    @ValueSource(strings = { "4", "5" })
-    @DisplayName("marks the unfinished menu options as coming soon")
-    void unimplementedOptionsSayComingSoon(String option) {
-        String output = runApp("1", option, "0");
-
-        assertTrue(output.contains("coming soon"));
-    }
-
-    // ---------- option 3: viewing the current folder ----------
+    // ---------- the features, driven through the menu ----------
 
     @Test
-    @DisplayName("lists the two files the game starts with")
-    void listsTheSeededFiles() {
-        String output = runApp("1", "3", "0");
+    @DisplayName("creates a file through menu option 1")
+    void makesAFile() {
+        // guest -> option 1 -> type the touch command -> exit
+        String output = runApp("3", "1", "touch mine.txt", "0");
+        assertTrue(output.contains("File Successfully created!"));
+    }
 
-        assertTrue(output.contains("Here are your current files and folders!"));
+    @Test
+    @DisplayName("creates a folder through menu option 2")
+    void makesAFolder() {
+        String output = runApp("3", "2", "mkdir projects", "0");
+        assertTrue(output.contains("Folder Successfully created!"));
+    }
+
+    @Test
+    @DisplayName("lists the current folder through menu option 3")
+    void viewsTheFolder() {
+        // option 3 -> type "ls" to list -> exit. The game starts with two files.
+        String output = runApp("3", "3", "ls", "0");
         assertTrue(output.contains("notes.txt"));
         assertTrue(output.contains("todo.md"));
     }
 
     @Test
-    @DisplayName("lists files in alphabetical order")
-    void sortsTheListing() {
-        String output = runApp("1", "3", "0");
-
-        assertTrue(output.indexOf("notes.txt") < output.indexOf("todo.md"),
-                "notes.txt should sort before todo.md");
-    }
-
-    // ---------- options 1 and 2 wired through the menu ----------
-
-    @Test
-    @DisplayName("creates a file through menu option 1")
-    void optionOneCreatesAFile() {
-        String output = runApp("1", "1", "touch mine.txt", "3", "0");
-
-        assertTrue(output.contains("File Successfully created!"));
-        assertTrue(output.contains("mine.txt"), "the new file should appear in the listing");
-    }
-
-    @Test
-    @DisplayName("creates a folder through menu option 2")
-    void optionTwoCreatesAFolder() {
-        String output = runApp("1", "2", "mkdir projects", "3", "0");
-
-        assertTrue(output.contains("Folder Successfully created!"));
-        assertTrue(output.contains("projects/"), "folders are listed with a trailing slash");
-    }
-
-    @Test
-    @DisplayName("shows folders before files in the listing")
-    void listsFoldersBeforeFiles() {
-        String output = runApp("1", "2", "mkdir zzz", "3", "0");
-
-        assertTrue(output.indexOf("zzz/") < output.indexOf("notes.txt"),
-                "the zzz/ folder should be printed above the files despite sorting last");
-    }
-
-    @Test
-    @DisplayName("keeps created items across several menu turns")
-    void remembersItemsBetweenMenuChoices() {
-        String output = runApp("1", "1", "touch alpha.txt", "2", "mkdir beta", "3", "0");
-
-        assertTrue(output.contains("alpha.txt"));
-        assertTrue(output.contains("beta/"));
-    }
-
-    @Test
-    @DisplayName("lets the player escape a command with * and carry on")
-    void starReturnsToTheMenuFromTheApp() {
-        String output = runApp("1", "1", "*", "3", "0");
-
-        assertTrue(output.contains("Returning to the main menu..."));
-        assertTrue(output.contains("Here are your current files and folders!"), "the menu should still work");
-        assertTrue(output.contains("Goodbye!"));
+    @DisplayName("changes into a folder through menu option 4")
+    void changesFolder() {
+        // make a folder, then cd into it - the breadcrumb should update.
+        String output = runApp("3", "2", "mkdir projects", "4", "cd projects", "0");
+        assertTrue(output.contains("Now in: root/projects"));
     }
 }

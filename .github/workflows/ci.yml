@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          # Must match maven.compiler.release in pom.xml.
+          java-version: "25"
+          cache: maven
+
+      - name: Build and test
+        run: ./mvnw -B verify
+
+      # The suite once reported "103 tests" while skipping 17 of them, because a
+      # class stayed @Disabled after the behaviour it described was removed. A
+      # skip is invisible in a green build, so fail the job on any of them
+      # rather than trusting the summary line.
+      - name: Fail if any test was skipped
+        run: |
+          skipped=$(find target/surefire-reports -name '*.xml' \
+            | xargs grep -ho 'skipped="[0-9]*"' \
+            | grep -o '[0-9]*' \
+            | awk '{total += $1} END {print total + 0}')
+          echo "Skipped tests: $skipped"
+          if [ "$skipped" -ne 0 ]; then
+            echo "::error::$skipped test(s) skipped. Delete them or fix them - do not disable them."
+            exit 1
+          fi
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: target/site/jacoco/
+          if-no-files-found: warn

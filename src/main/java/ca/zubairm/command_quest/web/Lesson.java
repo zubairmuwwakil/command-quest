@@ -58,6 +58,15 @@ public record Lesson(String title, String body, String example) {
                 and cd / to jump back to root.""",
                 "cd photos"));
 
+        lessons.put("pwd", new Lesson(
+                "Find where you are",
+                """
+                Type pwd - short for "print working directory" - to see the \
+                whole path from root down to the folder you are standing in. \
+                It takes no name. Once you have used cd a few times, this is \
+                how you get your bearings back.""",
+                "pwd"));
+
         return lessons;
     }
 }

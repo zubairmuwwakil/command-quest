@@ -1,14 +1,8 @@
 package ca.zubairm.command_quest.web;
 
-import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
 
-import ca.zubairm.command_quest.commands.CdCommand;
-import ca.zubairm.command_quest.commands.CommandResult;
-import ca.zubairm.command_quest.commands.MkDirCommand;
-import ca.zubairm.command_quest.commands.TouchCommand;
-import ca.zubairm.command_quest.commands.ViewCommand;
+import ca.zubairm.command_quest.commands.Shell;
 import ca.zubairm.command_quest.hub.Folder;
 import ca.zubairm.command_quest.hub.Navigator;
 
@@ -28,51 +22,32 @@ import jakarta.validation.Valid;
  * server keeps nothing afterwards. That is what makes a sleeping free-tier
  * container harmless: waking up with no memory costs the player nothing,
  * because the browser was holding the state all along.
+ *
+ * This class used to own a dispatch table keyed by lesson, which is how the
+ * lesson tabs came to decide what a player was allowed to type. Choosing a
+ * command from a typed line now belongs to Shell, and this is back to what it
+ * claims to be: unwrap the request, rebuild the world, hand back the result.
  */
 @RestController
 @RequestMapping("/api")
 public class CommandController {
 
-    private final TouchCommand touch = new TouchCommand();
-    private final MkDirCommand mkdir = new MkDirCommand();
-    private final ViewCommand ls = new ViewCommand();
-    private final CdCommand cd = new CdCommand();
-
-    /**
-     * One uniform dispatch table built from two different contracts.
-     *
-     * touch, mkdir, and ls take a Folder - they change what is in front of you.
-     * cd takes the Navigator - it changes where you are. Widening the Command
-     * interface so all four matched would hand every command the power to move
-     * the player, which only one of them needs.
-     *
-     * Adapting differently shaped things into one interface for routing is a
-     * boundary concern, so it lives here rather than in the domain.
-     */
-    private final Map<String, BiFunction<Navigator, String, CommandResult>> lessons = Map.of(
-            "touch", (nav, input) -> touch.execute(nav.current(), input),
-            "mkdir", (nav, input) -> mkdir.execute(nav.current(), input),
-            "ls",    (nav, input) -> ls.execute(nav.current(), input),
-            "cd",    (nav, input) -> cd.execute(nav, input));
+    private final Shell shell = new Shell();
 
     @PostMapping("/command")
     public CommandResponse command(@Valid @RequestBody CommandRequest request) {
-        BiFunction<Navigator, String, CommandResult> lesson = lessons.get(request.lessonId());
-        if (lesson == null) {
-            throw new IllegalArgumentException("Unknown lesson: " + request.lessonId());
-        }
-
         // Rebuild the world the browser described, act on it, and hand it back.
         Folder root = request.state().toDomain();
         Navigator navigator = Navigator.at(root, request.pathOrRoot());
 
-        CommandResult result = lesson.apply(navigator, request.command());
+        Shell.Result run = shell.execute(navigator, request.command());
 
         return new CommandResponse(
-                result.output(),
-                result.succeeded(),
-                result.finished(),
-                result.hint(),
+                run.commandId(),
+                run.result().output(),
+                run.result().succeeded(),
+                run.result().finished(),
+                run.result().hint(),
                 navigator.pathNames(),
                 FolderDto.from(root));
     }
@@ -90,10 +65,5 @@ public class CommandController {
     @GetMapping("/health")
     public ResponseEntity<Map<String, String>> health() {
         return ResponseEntity.ok(Map.of("status", "ok"));
-    }
-
-    /** Exposed for the front end to know what it may ask for. */
-    public List<String> lessonIds() {
-        return List.copyOf(lessons.keySet());
     }
 }

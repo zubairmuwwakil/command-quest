@@ -9,14 +9,20 @@ import java.util.List;
  * describing whether an operation worked, the API is describing whether the
  * player got the lesson right. They coincide today and need not always.
  *
- * @param output   the message to show the player
- * @param correct  whether the lesson was passed, which advances progress
- * @param finished whether the exchange is over, by success or by giving up
- * @param hint     a worked example to try next, or null
- * @param path     where the player now stands; changed only by cd
- * @param state    the whole folder tree after the command
+ * @param commandId which command ran, or null if the input matched none. The
+ *                  browser needs this because it no longer knows: it sends a
+ *                  line without saying what it expects to happen, so the answer
+ *                  has to say. It drives both progress and which lesson the
+ *                  panel shows.
+ * @param output    the message to show the player
+ * @param correct   whether the lesson was passed, which advances progress
+ * @param finished  whether the exchange is over, by success or by giving up
+ * @param hint      a worked example to try next, or null
+ * @param path      where the player now stands; changed only by cd
+ * @param state     the whole folder tree after the command
  */
 public record CommandResponse(
+        String commandId,
         String output,
         boolean correct,
         boolean finished,

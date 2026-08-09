@@ -23,7 +23,7 @@ public class LsCommand implements Command {
 		if (input.equals("ls")) {
 
 			System.out.println("Files in the current folder:");
-			for (String fileName : folder.getFiles()) {
+			for (String fileName : folder.getFileNames()) {
 				System.out.println("- " + fileName);
 			}
 

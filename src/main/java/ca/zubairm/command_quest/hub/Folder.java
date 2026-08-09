@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 public class Folder {
-	
+
 	//Encapsulation for OOP
-	
+
 	private String name;
-	private List<String> files;
+	private List<File> files;
 	private Map<String, Folder> subFolders;
 
 	public Folder(String name) {
@@ -26,16 +26,35 @@ public class Folder {
 	// Files
 
 	public void addFile(String fileName) {
-		files.add(fileName);
+		files.add(new File(fileName));
 	}
 
-	public List<String> getFiles() {
+	public List<File> getFiles() {
 		return files;
+	}
+
+	/** Just the names, for commands like ls that only print the listing. */
+	public List<String> getFileNames() {
+		List<String> names = new ArrayList<>();
+		for (File file : files) {
+			names.add(file.getName());
+		}
+		return names;
+	}
+
+	/** The file itself, or null if this folder has no such file. */
+	public File getFile(String fileName) {
+		for (File file : files) {
+			if (file.getName().equals(fileName)) {
+				return file;
+			}
+		}
+		return null;
 	}
 
 	public boolean hasFile(String file) {
 
-		return files.contains(file);
+		return getFile(file) != null;
 	}
 
 	// SubFolders

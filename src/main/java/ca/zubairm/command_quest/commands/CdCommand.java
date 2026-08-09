@@ -1,5 +1,6 @@
 package ca.zubairm.command_quest.commands;
 
+import java.util.Arrays;
 import java.util.Scanner;
 
 import ca.zubairm.command_quest.hub.Navigator;
@@ -43,7 +44,20 @@ public class CdCommand {
 		}
 
 		String[] tokens = typed.split("\\s+");
-		if (tokens.length < 2 || !tokens[0].equals("cd")) {
+
+		// The specific complaint has to come before the general one. A spaced
+		// target fails the format check below as well, but "try: cd <name>"
+		// tells a player who typed a folder name they can see on screen
+		// nothing about which part of the line was wrong.
+		if (tokens[0].equals("cd") && tokens.length > 2) {
+			return rejected(spacingLesson(tokens));
+		}
+
+		// Exactly two words: "cd" and one target. "< 2" only ever rejected too
+		// FEW words, so "cd nested folder" read tokens[1] and threw "folder"
+		// away - the player moved into nested/ and learned that spaces are
+		// harmless. Real bash answers "cd: too many arguments".
+		if (tokens.length != 2 || !tokens[0].equals("cd")) {
 			return rejected("Not quite - try: cd <name>, cd .., or cd /");
 		}
 
@@ -67,6 +81,29 @@ public class CdCommand {
 
 		navigator.into(navigator.current().getSubFolders().get(target));
 		return moved(navigator);
+	}
+
+	/**
+	 * The message for a target that was typed with spaces in it.
+	 *
+	 * It counts the words back to the player so the space itself becomes the
+	 * lesson rather than a mystery - the same move AbstractCommand makes for
+	 * mkdir and touch.
+	 *
+	 * What it deliberately does NOT do is offer a joined-up name. mkdir and
+	 * touch invent their names, so "nested folder me" -> "nestedFolderMe" is a
+	 * fair guess at what the player meant. cd's targets are folders that
+	 * already exist, plus ".." and "/", so suggesting "cd myPhotos" to someone
+	 * whose folder is not called that just replaces one wrong line with
+	 * another. The hint carries the worked example instead.
+	 */
+	private String spacingLesson(String[] tokens) {
+		String[] targets = Arrays.copyOfRange(tokens, 1, tokens.length);
+
+		return "Not quite - \"cd\" moves to one place at a time.\n"
+				+ "A space starts a new word, so that line asks for "
+				+ targets.length + " places: " + String.join(", ", targets) + ".\n"
+				+ "Folder names cannot contain spaces.";
 	}
 
 	private CommandResult moved(Navigator navigator) {

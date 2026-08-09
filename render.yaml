@@ -20,4 +20,4 @@ services:
       # GitHub Pages URL. A wildcard would let any site on the internet post
       # folder trees here, which is needless when the caller is known.
       - key: COMMANDQUEST_ALLOWED_ORIGINS
-        value: https://zubairmuwwakil.github.io
+        value: https://commandquest.zubairmuwwakil.com,https://zubairmuwwakil.github.io

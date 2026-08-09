@@ -27,10 +27,20 @@ public class CommandQuestApplication {
      * Listed explicitly rather than "*": this API takes a folder tree from the
      * caller, and there is no reason for arbitrary sites to be posting to it.
      */
+    /**
+     * An origin is scheme + host + port and nothing else, so every address the
+     * site is reachable at has to be listed separately - a custom domain and
+     * the github.io address serving byte-identical files are still two
+     * different origins to a browser.
+     *
+     * The github.io entry is kept alongside the custom domain so the old link
+     * does not break for anyone who bookmarked it.
+     */
     @Bean
     WebMvcConfigurer corsConfiguration(
             @org.springframework.beans.factory.annotation.Value(
                     "${commandquest.allowed-origins:"
+                            + "https://commandquest.zubairmuwwakil.com,"
                             + "https://zubairmuwwakil.github.io,"
                             + "http://localhost:5500,http://127.0.0.1:5500}")
             String[] allowedOrigins) {

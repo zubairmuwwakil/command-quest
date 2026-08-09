@@ -2,16 +2,16 @@ package ca.zubairm.command_quest;
 
 import java.util.Scanner;
 
+import ca.zubairm.command_quest.commands.CdCommand;
 import ca.zubairm.command_quest.commands.Command;
 import ca.zubairm.command_quest.commands.MkDirCommand;
 import ca.zubairm.command_quest.commands.TouchCommand;
-import ca.zubairm.command_quest.commands.ViewCommand;
-import ca.zubairm.command_quest.commands.CdCommand;
+import ca.zubairm.command_quest.commands.LsCommand;
 import ca.zubairm.command_quest.hub.Folder;
 import ca.zubairm.command_quest.hub.Navigator;
-import ca.zubairm.command_quest.user.UserManager;
 import ca.zubairm.command_quest.user.LoginScreen;
 import ca.zubairm.command_quest.user.User;
+import ca.zubairm.command_quest.user.UserManager;
 
 public class App {
 	public static void main(String[] args) {
@@ -28,7 +28,7 @@ public class App {
 		// (check day 6 in teacher led)
 		Command makeFile = new TouchCommand();
 		Command makeFolder = new MkDirCommand();
-		Command viewFolder = new ViewCommand();
+		Command viewFolder = new LsCommand();
 		CdCommand cd = new CdCommand();          // navigation: its own contract, not a Command
 
 		// accounts

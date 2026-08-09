@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 import ca.zubairm.command_quest.hub.Folder;
 
-public class ViewCommand implements Command {
+public class LsCommand implements Command {
 	@Override
 	public void run(Folder folder, Scanner scanner) {
 

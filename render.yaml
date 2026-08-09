@@ -6,7 +6,7 @@
 
 services:
   - type: web
-    name: command-quest
+    name: command-quest-1
     runtime: docker
     dockerfilePath: ./Dockerfile
     plan: free

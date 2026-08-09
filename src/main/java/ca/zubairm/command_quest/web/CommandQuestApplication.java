@@ -30,7 +30,9 @@ public class CommandQuestApplication {
     @Bean
     WebMvcConfigurer corsConfiguration(
             @org.springframework.beans.factory.annotation.Value(
-                    "${commandquest.allowed-origins:http://localhost:5500,http://127.0.0.1:5500}")
+                    "${commandquest.allowed-origins:"
+                            + "https://zubairmuwwakil.github.io,"
+                            + "http://localhost:5500,http://127.0.0.1:5500}")
             String[] allowedOrigins) {
 
         return new WebMvcConfigurer() {

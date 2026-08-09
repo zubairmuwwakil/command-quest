@@ -34,7 +34,7 @@ Both steps need an account, so they cannot be scripted from here.
 3. Deploy, and wait for the first build. It takes a few minutes — the Docker
    layer cache is cold and Maven downloads the dependency tree once.
 4. Note the URL it gives you, something like
-   `https://command-quest-api.onrender.com`.
+   `https://command-quest-1.onrender.com`.
 5. Check it: `curl https://YOUR-URL/api/health` should return `{"status":"ok"}`.
 
 Any other container host works the same way — Fly.io, Koyeb, Railway. The
@@ -52,7 +52,7 @@ Dockerfile is not Render-specific; only `render.yaml` is.
 Two values must agree, and the app fails in a confusing way if they do not.
 
 **The page needs the API's address.** `docs/app.js` falls back to
-`https://command-quest-api.onrender.com`. If Render gave you a different URL,
+`https://command-quest-1.onrender.com`. If Render gave you a different URL,
 edit the `API` constant near the top of that file.
 
 **The API needs the page's origin.** In `render.yaml`, set

@@ -260,28 +260,85 @@ class AbstractCommandTest {
         assertTrue(output.contains("Returning to the main menu..."));
     }
 
-    // ---------- known validation gap (characterisation test) ----------
+    // ---------- the extra-arguments branch ----------
 
     /**
-     * The guard is "tokens.length < 2", which never rejects too MANY tokens, so
-     * trailing arguments are silently discarded. A real shell would treat
-     * "touch a.txt b.txt" as a request for two files.
-     *
-     * This test documents the behaviour as it stands today. Tightening the
-     * guard to "tokens.length != 2" is the fix; this test is what should be
-     * updated to assert rejection once that change is made.
+     * A space starts a new word, so "mkdir nested folder me" is three names in
+     * a real shell and it makes three folders. Command Quest teaches one name
+     * at a time, so rather than quietly keeping the first word and throwing the
+     * rest away - which taught the player that spaces are harmless - the whole
+     * line is refused and the reason is explained.
      */
     @Test
-    @DisplayName("KNOWN GAP: silently ignores extra arguments")
-    void extraArgumentsAreCurrentlyIgnored() {
+    @DisplayName("refuses a name that was typed with spaces in it")
+    void rejectsExtraArguments() {
         Folder folder = new Folder("root");
-        Scanner input = keystrokes("touch hello.txt extra junk");
+        // Deliberately different names: if the first line were still honoured,
+        // "first.txt" would exist and "second.txt" would never be read.
+        Scanner input = keystrokes("touch first.txt extra.txt", "touch second.txt");
 
         captureOutput(() -> new TouchCommand().run(folder, input));
 
+        assertFalse(folder.hasFile("first.txt"), "the spaced line should create nothing at all");
+        assertFalse(folder.hasFile("extra.txt"), "least of all the trailing words");
+        assertEquals(java.util.List.of("second.txt"), folder.getFiles());
+    }
+
+    @Test
+    @DisplayName("explains that a space starts a new name")
+    void explainsWhySpacesAreTheProblem() {
+        Folder folder = new Folder("root");
+        Scanner input = keystrokes("mkdir nested folder me", "mkdir nestedFolderMe");
+
+        String output = captureOutput(() -> new MkDirCommand().run(folder, input));
+
+        assertTrue(output.contains("makes one folder at a time"),
+                "expected the spacing lesson, got:\n" + output);
+        assertTrue(output.contains("3 folders"),
+                "expected the player's own word count back, got:\n" + output);
+    }
+
+    @Test
+    @DisplayName("suggests the joined-up name the player probably meant")
+    void suggestsJoiningTheWords() {
+        Folder folder = new Folder("root");
+        Scanner input = keystrokes("mkdir nested folder me", "mkdir nestedFolderMe");
+
+        String output = captureOutput(() -> new MkDirCommand().run(folder, input));
+
+        assertTrue(output.contains("mkdir nestedFolderMe"),
+                "expected a joined-up suggestion, got:\n" + output);
+        assertTrue(folder.hasSubFolder("nestedFolderMe"), "the retry should succeed");
+    }
+
+    @Test
+    @DisplayName("keeps the suggestion out of the way when it would be invalid")
+    void omitsASuggestionThatWouldNotBeAccepted() {
+        Folder folder = new Folder("root");
+        // "myFile" has no extension, so touch would reject the suggestion too.
+        Scanner input = keystrokes("touch my file", "touch myFile.txt");
+
+        String output = captureOutput(() -> new TouchCommand().run(folder, input));
+
+        assertFalse(output.contains("Did you mean"),
+                "should not suggest a name its own pattern forbids, got:\n" + output);
+        assertTrue(output.contains("makes one file at a time"));
+        assertTrue(output.contains("Here's an example: touch chicken.leg"),
+                "should fall back to the worked example, got:\n" + output);
+    }
+
+    @Test
+    @DisplayName("still names the right command when the keyword is wrong AND spaced")
+    void wrongKeywordWithExtraWordsIsAPlainFormatError() {
+        Folder folder = new Folder("root");
+        Scanner input = keystrokes("mkdir a b c", "touch hello.txt");
+
+        String output = captureOutput(() -> new TouchCommand().run(folder, input));
+
+        // TouchCommand has no business lecturing about mkdir's spacing.
+        assertTrue(output.contains("Not quite - the format was off."),
+                "expected the generic format error, got:\n" + output);
         assertTrue(folder.hasFile("hello.txt"));
-        assertFalse(folder.hasFile("extra"), "the extra arguments are dropped, not created");
-        assertEquals(1, folder.getFiles().size());
     }
 
     // ---------- the template method is genuinely open for extension ----------
@@ -382,6 +439,28 @@ class AbstractCommandTest {
                 "the format praise is kept - the syntax lesson was learned");
         assertTrue(result.output().contains("file already exists"));
         assertEquals(1, folder.getFiles().size(), "no duplicate was added");
+    }
+
+    /**
+     * The browser reaches AbstractCommand through execute() and never through
+     * run(), so the spacing rule has to be pinned here too - this is the exact
+     * path that turned "mkdir nested folder me" into one folder called
+     * "nested" on the deployed site.
+     */
+    @Test
+    @DisplayName("execute() refuses a spaced name and explains the space")
+    void executeRefusesASpacedName() {
+        Folder folder = new Folder("root");
+
+        CommandResult result = new MkDirCommand().execute(folder, "mkdir nested folder me");
+
+        assertFalse(result.succeeded());
+        assertFalse(result.finished(), "the player should get another go");
+        assertTrue(result.output().contains("makes one folder at a time"),
+                "expected the spacing lesson, got:\n" + result.output());
+        assertTrue(result.output().contains("Did you mean: mkdir nestedFolderMe"),
+                "expected the joined-up suggestion, got:\n" + result.output());
+        assertTrue(folder.getSubFolders().isEmpty(), "no folder at all, not even the first word");
     }
 
     @Test

@@ -21,26 +21,32 @@ public class LsCommand implements Command {
 				To go back to the main menu, type *
 				""");
 		System.out.print("Enter a command: ");
-		String input = scanner.nextLine().trim();
-		
-		if (input.equals("*")) {
-			System.out.println("Returning to the main menu...\n");
-			return;
-		}
-		if (input.equals("ls")) {
 
-			System.out.println("Files in the current folder:");
-			for (String fileName : folder.getFiles()) {
-				System.out.println("- " + fileName);
+		while (true) {
+			String input = scanner.nextLine().trim();
+
+			if (input.equals("*")) {
+				System.out.println("Returning to the main menu...\n");
+				return;
 			}
 
-			System.out.println("\nSubfolders in the current folder:");
-			for (String subFolderName : folder.getSubFolders().keySet()) {
-				System.out.println("- " + subFolderName);
+			if (input.equals("ls")) {
+
+				System.out.println("Files in the current folder:");
+				for (String fileName : folder.getFiles()) {
+					System.out.println("- " + fileName);
+				}
+
+				System.out.println("\nSubfolders in the current folder:");
+				for (String subFolderName : folder.getSubFolders().keySet()) {
+					System.out.println("- " + subFolderName);
+				}
+
+				return;
 			}
 
+			System.out.println("\nNot quite - type ls on its own to list this folder.");
+			System.out.print("Enter a command: ");
 		}
-
-		
 	}
 }

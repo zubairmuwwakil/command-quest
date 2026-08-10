@@ -42,7 +42,7 @@ public class LoginScreen {
                 System.out.print("\nChoose a username: ");
                 String username = scanner.nextLine().trim();
 
-                if (userManager.UsernameExists(username)) {
+                if (userManager.usernameExists(username)) {
                     System.out.println("\nThat username is taken. Try another.\n");
                     break;
                 }

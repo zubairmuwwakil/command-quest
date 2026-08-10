@@ -22,7 +22,7 @@ class UserManagerTest {
     void unknownUsernameIsFree() {
         UserManager users = new UserManager();
 
-        assertFalse(users.UsernameExists("bob"));
+        assertFalse(users.usernameExists("bob"));
     }
 
     @Test
@@ -31,7 +31,7 @@ class UserManagerTest {
         UserManager users = new UserManager();
         users.addUser("bob", "1234");
 
-        assertTrue(users.UsernameExists("bob"));
+        assertTrue(users.usernameExists("bob"));
     }
 
     @Test

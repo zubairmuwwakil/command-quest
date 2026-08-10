@@ -10,7 +10,7 @@ public class UserManager {
 	
 	private Map<String, User> users = new HashMap<>();
 
-	public boolean UsernameExists ( String username) {
+	public boolean usernameExists ( String username) {
 		
 		return username != null && users.containsKey(username);
 	}
@@ -22,7 +22,7 @@ public class UserManager {
 	
 	public User login (String username, String pin) {
 		
-		if (UsernameExists(username)) {
+		if (usernameExists(username)) {
 			
 		
 			User user = users.get(username);

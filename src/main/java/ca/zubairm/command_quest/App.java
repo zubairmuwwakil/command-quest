@@ -18,7 +18,6 @@ public class App {
 
 		Scanner scanner = new Scanner(System.in);
 
-		// the sandbox tree + where we are in it
 		Folder currentFolder = new Folder("root");
 		Navigator navigator = new Navigator(currentFolder);
 		currentFolder.addFile("todo.md");
@@ -29,7 +28,7 @@ public class App {
 		Command makeFile = new TouchCommand();
 		Command makeFolder = new MkDirCommand();
 		Command viewFolder = new LsCommand();
-		CdCommand cd = new CdCommand();          // navigation: its own contract, not a Command
+		Command cd = new CdCommand();          // navigation is a Command too - it just moves instead of creating
 
 		// accounts
 		UserManager userManager = new UserManager();
@@ -77,13 +76,13 @@ public class App {
 					switch (selection) {
 					// abstraction complete - how files/folders are made is hidden in the commands
 					case 1:
-						makeFile.run(navigator.current(), scanner);
+						makeFile.run(navigator, scanner);
 						break;
 					case 2:
-						makeFolder.run(navigator.current(), scanner);
+						makeFolder.run(navigator, scanner);
 						break;
 					case 3:
-						viewFolder.run(navigator.current(), scanner);
+						viewFolder.run(navigator, scanner);
 						break;
 					case 4:
 						cd.run(navigator, scanner);

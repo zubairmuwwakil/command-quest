@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 import ca.zubairm.command_quest.hub.Folder;
+import ca.zubairm.command_quest.hub.Navigator;
 
 //abstraction for OOP
 
@@ -30,7 +31,10 @@ public abstract class AbstractCommand implements Command {
 
     
     @Override
-    public void run(Folder folder, Scanner scanner) {
+    public void run(Navigator navigator, Scanner scanner) {
+    	
+    	Folder folder = navigator.current();
+    	
         System.out.println(lesson);
         System.out.print("Enter command: ");
 
@@ -46,17 +50,13 @@ public abstract class AbstractCommand implements Command {
 
             String[] tokens = line.trim().split("\\s+");
 
-            // The specific complaint has to come before the general one. A
-            // spaced name fails the format check below as well, but "the format
-            // was off" leaves the player staring at a line that looks perfectly
-            // reasonable to them, with no clue which part of it was wrong.
+        
             if (tokens[0].equals(keyword) && tokens.length > 2) {
                 System.out.println("\n" + spacingLesson(tokens));
                 System.out.print("Enter command: ");
             }
 
-            // Exactly two words: the keyword and one name. "< 2" used to let a
-            // longer line through and quietly drop everything after tokens[1].
+     
             else if (tokens.length != 2 || !tokens[0].equals(keyword) || !tokens[1].matches(namePattern)) {
                 System.out.println("\nNot quite - the format was off.");
                 System.out.println("Here's another example: " + example + "\n");
@@ -77,15 +77,7 @@ public abstract class AbstractCommand implements Command {
         }
     }
 
-    /**
-     * The message for a name that was typed with spaces in it.
-     *
-     * A real shell would read "mkdir nested folder me" as three names and make
-     * three folders. Command Quest teaches one name at a time, so it refuses
-     * the line - but it counts the words back to the player and offers the
-     * joined-up name they almost certainly meant, so the space is the lesson
-     * rather than a mystery.
-     */
+  
     private String spacingLesson(String[] tokens) {
         String[] names = Arrays.copyOfRange(tokens, 1, tokens.length);
 
@@ -97,10 +89,8 @@ public abstract class AbstractCommand implements Command {
                 .append(String.join(", ", names)).append(".\n")
                 .append(capitalize(noun)).append(" names cannot contain spaces.");
 
-        // Only worth suggesting if the suggestion would actually be accepted -
-        // "touch my file" joins to "myFile", which touch would reject for
-        // having no extension. Falling back to the worked example means the
-        // player is never left with a complaint and no way forward.
+        
+        
         String joined = joinIntoOneName(names);
         if (joined.matches(namePattern)) {
             message.append("\nDid you mean: ").append(keyword).append(" ").append(joined);

@@ -2,9 +2,9 @@ package ca.zubairm.command_quest.commands;
 
 import java.util.Scanner;
 
-import ca.zubairm.command_quest.hub.Folder;
+import ca.zubairm.command_quest.hub.Navigator;
 
 //interface
 public interface Command {
-    void run(Folder folder, Scanner scanner);
+    void run(Navigator navigator, Scanner scanner);
 }

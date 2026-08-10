@@ -5,12 +5,14 @@ import java.util.Scanner;
 import ca.zubairm.command_quest.hub.Navigator;
 
 /**
- * The cd command - moves BETWEEN folders. It needs the Navigator (to change
- * which folder is current), not just a Folder, so it deliberately does NOT
- * implement Command. Navigation is its own contract: run(Navigator, Scanner).
+ * The cd command - moves BETWEEN folders rather than creating things inside
+ * one. It takes the Navigator like every Command does, but where touch and
+ * mkdir call current() to reach a folder, cd calls up(), into(), and toRoot()
+ * to change which folder current() will return.
  */
-public class CdCommand {
+public class CdCommand implements Command {
 
+	@Override
 	public void run(Navigator navigator, Scanner scanner) {
 		System.out.println("""
 

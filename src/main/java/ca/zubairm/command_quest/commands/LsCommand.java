@@ -3,10 +3,12 @@ package ca.zubairm.command_quest.commands;
 import java.util.Scanner;
 
 import ca.zubairm.command_quest.hub.Folder;
+import ca.zubairm.command_quest.hub.Navigator;
 
 public class LsCommand implements Command {
 	@Override
-	public void run(Folder folder, Scanner scanner) {
+	public void run(Navigator navigator, Scanner scanner) {
+		Folder folder = navigator.current();
 
 		System.out.println("""
 				To view your files and folders, you can use the command 'ls' (short for 'list').

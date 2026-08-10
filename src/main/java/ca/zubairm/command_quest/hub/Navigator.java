@@ -28,9 +28,18 @@ public class Navigator {
         return path.peek();
     }
 
-    // cd <name>: step INTO a subfolder -> push it, it becomes current.
-    public void into(Folder sub) {
+    // cd <name>: step INTO a subfolder of the CURRENT folder -> push it.
+    // Taking a name rather than a Folder is what keeps the stack honest: the
+    // only thing that can be pushed is a genuine child of where you already
+    // are, so the stack can never stop being a real root-to-current path.
+    // Returns false if the current folder has no such child.
+    public boolean into(String name) {
+        Folder sub = path.peek().getSubFolder(name);
+        if (sub == null) {
+            return false;
+        }
         path.push(sub);
+        return true;
     }
 
     // cd .. : step UP one level -> pop. Guard so we never pop past root.

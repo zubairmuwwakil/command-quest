@@ -43,16 +43,14 @@ public class CdCommand implements Command {
 			boolean moved = false;
 
 			if (target.equals("..")) {
-				if (navigator.up()) moved = true;
-				else System.out.println("\nAlready at root.");
+				moved = navigator.up();
+				if (!moved) System.out.println("\nAlready at root.");
 			} else if (target.equals("/")) {
 				navigator.toRoot();
 				moved = true;
-			} else if (navigator.current().hasSubFolder(target)) {
-				navigator.into(navigator.current().getSubFolders().get(target));
-				moved = true;
 			} else {
-				System.out.println("\nNo folder named '" + target + "' here.");
+				moved = navigator.into(target);
+				if (!moved) System.out.println("\nNo folder named '" + target + "' here.");
 			}
 
 			if (moved) {

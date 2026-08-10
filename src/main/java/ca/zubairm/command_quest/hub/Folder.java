@@ -49,6 +49,12 @@ public class Folder {
 		subFolders.put(folderName, new Folder(folderName));
 	}
 
+	// get a subfolder used by nested folders 
+	
+	public Folder getSubFolder(String folderName) {
+		return subFolders.get(folderName);
+	}
+
 	public Map<String, Folder> getSubFolders() {
 		return subFolders;
 	}

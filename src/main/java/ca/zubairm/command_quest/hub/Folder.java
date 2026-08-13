@@ -10,7 +10,9 @@ public class Folder {
 	//Encapsulation for OOP
 	
 	private String name;
+	//for files a list was used because it preserves the order of insertion 
 	private List<String> files;
+	//for subfolders a map was used because it allows for fast lookup by name
 	private Map<String, Folder> subFolders;
 
 	public Folder(String name) {

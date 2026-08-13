@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import ca.zubairm.command_quest.hub.Folder;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -78,7 +80,8 @@ class FolderTest {
      * Characterisation test: files are stored in a List, which permits
      * duplicates. Nothing in Folder prevents the same name twice - the game
      * avoids it only because AbstractCommand checks hasFile() before calling
-     * addFile(). A Set would enforce the rule structurally instead.
+     * addFile(). A Map keyed by name would enforce the rule structurally, the
+     * way subFolders below does.
      */
     @Test
     @DisplayName("does not itself prevent duplicate file names (List, not Set)")

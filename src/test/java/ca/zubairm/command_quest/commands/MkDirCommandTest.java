@@ -1,9 +1,12 @@
-package ca.zubairm.command_quest;
+package ca.zubairm.command_quest.commands;
 
 import static ca.zubairm.command_quest.TestSupport.captureOutput;
 import static ca.zubairm.command_quest.TestSupport.keystrokes;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import ca.zubairm.command_quest.hub.Folder;
+import ca.zubairm.command_quest.hub.Navigator;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,7 +27,7 @@ class MkDirCommandTest {
     void acceptsWellFormedFolderNames(String folderName) {
         Folder folder = new Folder("root");
 
-        captureOutput(() -> new MkDirCommand().run(folder, keystrokes("mkdir " + folderName)));
+        captureOutput(() -> new MkDirCommand().run(new Navigator(folder), keystrokes("mkdir " + folderName)));
 
         assertTrue(folder.hasSubFolder(folderName));
     }
@@ -36,7 +39,7 @@ class MkDirCommandTest {
         Folder folder = new Folder("root");
 
         String output = captureOutput(
-                () -> new MkDirCommand().run(folder, keystrokes("mkdir " + folderName, "mkdir ok")));
+                () -> new MkDirCommand().run(new Navigator(folder), keystrokes("mkdir " + folderName, "mkdir ok")));
 
         assertTrue(output.contains("Not quite - the format was off."),
                 "expected \"" + folderName + "\" to be rejected");
@@ -54,7 +57,7 @@ class MkDirCommandTest {
         Folder folder = new Folder("root");
 
         String output = captureOutput(
-                () -> new MkDirCommand().run(folder, keystrokes("mkdir notes.txt", "mkdir notes")));
+                () -> new MkDirCommand().run(new Navigator(folder), keystrokes("mkdir notes.txt", "mkdir notes")));
 
         assertTrue(output.contains("Not quite - the format was off."));
         assertTrue(folder.hasSubFolder("notes"));
@@ -66,7 +69,7 @@ class MkDirCommandTest {
         Folder folder = new Folder("root");
 
         String output = captureOutput(
-                () -> new MkDirCommand().run(folder, keystrokes("touch projects", "mkdir projects")));
+                () -> new MkDirCommand().run(new Navigator(folder), keystrokes("touch projects", "mkdir projects")));
 
         assertTrue(output.contains("Not quite - the format was off."));
     }
@@ -78,7 +81,7 @@ class MkDirCommandTest {
         folder.addSubFolder("projects");
 
         String output = captureOutput(
-                () -> new MkDirCommand().run(folder, keystrokes("mkdir projects", "mkdir games")));
+                () -> new MkDirCommand().run(new Navigator(folder), keystrokes("mkdir projects", "mkdir games")));
 
         assertTrue(output.contains("folder already exists"),
                 "expected the duplicate warning, got:\n" + output);
@@ -122,7 +125,7 @@ class MkDirCommandTest {
     void announcesFolderNotFile() {
         Folder folder = new Folder("root");
 
-        String output = captureOutput(() -> new MkDirCommand().run(folder, keystrokes("mkdir projects")));
+        String output = captureOutput(() -> new MkDirCommand().run(new Navigator(folder), keystrokes("mkdir projects")));
 
         assertTrue(output.contains("Folder Successfully created!"),
                 "expected the folder-specific message, got:\n" + output);

@@ -11,13 +11,13 @@ public class LsCommand implements Command {
 		Folder folder = navigator.current();
 
 		System.out.println("""
-				
+
 				To view your files and folders, you can use the command 'ls' (short for 'list').
 				... Yea no thats it lol
-				
-				Note it will only show files or folders in the 
+
+				Note it will only show files or folders in the
 				current folder (otherwise known as a directory).
-				
+
 				To go back to the main menu, type *
 				""");
 		System.out.print("Enter a command: ");

@@ -77,7 +77,8 @@ public abstract class AbstractCommand implements Command {
         }
     }
 
-  
+    // typically a shell creates multiple folders with a single command, 
+    //but this lesson is about creating one at a time. This method explains that to the user.
     private String spacingLesson(String[] tokens) {
         String[] names = Arrays.copyOfRange(tokens, 1, tokens.length);
 

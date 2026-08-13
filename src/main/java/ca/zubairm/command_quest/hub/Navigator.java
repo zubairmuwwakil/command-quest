@@ -16,7 +16,9 @@ import java.util.Iterator;
  * so the head is the "top" (your current folder) and the tail is root.
  */
 public class Navigator {
-
+	
+	//arraydeque used because of its last in frist out property 
+	//this mimics the nav behaviour of a normal terminal file nav system
     private Deque<Folder> path = new ArrayDeque<>();
 
     public Navigator(Folder root) {

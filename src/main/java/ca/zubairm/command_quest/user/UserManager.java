@@ -8,6 +8,7 @@ import java.util.Map;
 
 public class UserManager {
 	
+	// a map is used to store users for fast lookup by username
 	private Map<String, User> users = new HashMap<>();
 
 	public boolean usernameExists ( String username) {
@@ -19,6 +20,12 @@ public class UserManager {
 		
 		users.put(username, new User(username, pin));
 	}
+	public void changePin (String username, String newPin) {
+		
+		
+		users.put(username, new User(username, newPin));
+	}
+	
 	
 	public User login (String username, String pin) {
 		

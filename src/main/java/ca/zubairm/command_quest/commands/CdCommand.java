@@ -10,6 +10,12 @@ import ca.zubairm.command_quest.hub.Navigator;
  * mkdir call current() to reach a folder, cd calls up(), into(), and toRoot()
  * to change which folder current() will return.
  */
+
+/**
+ * this class shows LSP b/c cd command implemnts from command instead
+ * of extending from abstract command
+ * this ensure that cdcommand can be used in place of command without breaking the code
+ */
 public class CdCommand implements Command {
 
 	@Override

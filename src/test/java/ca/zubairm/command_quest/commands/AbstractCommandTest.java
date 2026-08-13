@@ -475,4 +475,50 @@ class AbstractCommandTest {
         assertEquals("Returning to the main menu...", result.output());
         assertTrue(folder.getFiles().isEmpty());
     }
+
+    // ---------- naming something after a teammate ----------
+
+    /**
+     * The shoutout rides in the CommandResult rather than a println, which is
+     * what lets the same easter egg reach the terminal and the browser without
+     * either one knowing about it.
+     */
+    @Test
+    @DisplayName("naming a folder after a teammate says so")
+    void greetsATeammateOnMkdir() {
+        Folder folder = new Folder("root");
+
+        CommandResult result = new MkDirCommand().execute(folder, "mkdir victoria");
+
+        assertTrue(result.succeeded());
+        assertTrue(folder.hasSubFolder("victoria"), "the folder is still actually made");
+        assertTrue(result.output().contains("Victoria Oyedotun"),
+                "expected the shoutout; got:\n" + result.output());
+        assertTrue(result.output().contains("Folder Successfully created!"),
+                "the ordinary confirmation must survive; got:\n" + result.output());
+    }
+
+    @Test
+    @DisplayName("naming a file after a teammate says so, extension and all")
+    void greetsATeammateOnTouch() {
+        Folder folder = new Folder("root");
+
+        CommandResult result = new TouchCommand().execute(folder, "touch seun.md");
+
+        assertTrue(result.succeeded());
+        assertTrue(folder.hasFile("seun.md"));
+        assertTrue(result.output().contains("Seun Edagbami-olota"),
+                "the extension must not stop the match; got:\n" + result.output());
+    }
+
+    @Test
+    @DisplayName("an ordinary name gets the ordinary confirmation and nothing more")
+    void saysNothingExtraForOrdinaryNames() {
+        Folder folder = new Folder("root");
+
+        CommandResult result = new MkDirCommand().execute(folder, "mkdir homework");
+
+        assertEquals("Folder Successfully created!", result.output(),
+                "no easter egg should fire for a name nobody on the team has");
+    }
 }

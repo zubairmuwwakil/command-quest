@@ -3,6 +3,7 @@ package ca.zubairm.command_quest.commands;
 import java.util.Arrays;
 import java.util.Scanner;
 
+import ca.zubairm.command_quest.Credits;
 import ca.zubairm.command_quest.hub.Folder;
 
 //abstraction for OOP
@@ -105,10 +106,18 @@ public abstract class AbstractCommand implements Command {
         }
 
         create(folder, tokens[1]);
-        return new CommandResult(
-                CommandResult.Outcome.SUCCEEDED,
-                capitalize(noun) + " Successfully created!",
-                null);
+
+        String confirmation = capitalize(noun) + " Successfully created!";
+
+        // Name something after a teammate and they answer. Carried in the
+        // result rather than printed, so it reaches the browser as readily as
+        // the terminal - neither caller needs to know the egg exists.
+        String shoutout = Credits.shoutoutFor(tokens[1]);
+        if (shoutout != null) {
+            confirmation += "\n\n" + shoutout;
+        }
+
+        return new CommandResult(CommandResult.Outcome.SUCCEEDED, confirmation, null);
     }
 
     /**

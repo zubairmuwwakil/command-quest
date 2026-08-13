@@ -47,6 +47,7 @@ public class Shell {
     private final ViewCommand ls = new ViewCommand();
     private final CdCommand cd = new CdCommand();
     private final PwdCommand pwd = new PwdCommand();
+    private final CreditsCommand credits = new CreditsCommand();
 
     /**
      * LinkedHashMap, not Map.of, and the difference is user-visible.
@@ -59,6 +60,19 @@ public class Shell {
      * order of the tabs above it.
      */
     private final Map<String, Entry> registry = new LinkedHashMap<>();
+
+    /**
+     * Commands that work but are never spoken of.
+     *
+     * A second map rather than a flag on Entry, because every place that reads
+     * the vocabulary aloud - help, the unknown-command reply, the typo
+     * suggester, and keywords() for the browser's lesson tabs - walks the
+     * registry. Registering a hidden command there and then filtering it out of
+     * four separate readers is four chances to forget one. Keeping it outside
+     * the registry means dispatch is the only thing that can see it, and the
+     * secret holds by construction instead of by vigilance.
+     */
+    private final Map<String, Entry> hidden = new LinkedHashMap<>();
 
     public Shell() {
         // touch, mkdir and ls act on the folder in front of you; cd and pwd need
@@ -74,6 +88,10 @@ public class Shell {
                 (nav, input) -> cd.execute(nav, input)));
         registry.put("pwd", new Entry("pwd", "show where you are",
                 (nav, input) -> pwd.execute(nav, input)));
+
+        // Not in the registry, so nothing lists it. Found by typing it.
+        hidden.put("credits", new Entry("credits", "the people behind the game",
+                (nav, input) -> credits.execute(nav.current(), input)));
     }
 
     public Result execute(Navigator navigator, String input) {
@@ -91,6 +109,9 @@ public class Shell {
         }
 
         Entry entry = registry.get(keyword);
+        if (entry == null) {
+            entry = hidden.get(keyword);
+        }
         if (entry == null) {
             return unrecognised(keyword);
         }

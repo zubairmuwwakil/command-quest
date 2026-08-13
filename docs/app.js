@@ -12,14 +12,50 @@
 (() => {
   'use strict';
 
+  // ---------------------------------------------------------------- state
+
+  /*
+   * The starting tree.
+   *
+   * .team is hidden the way a real shell hides things - a leading dot - so it
+   * takes "ls -a" to turn it up, and the sidebar declines to draw it. Defined
+   * above the browser wiring so Node can load this file for its tests.
+   */
+  const SEED = {
+    name: 'root',
+    files: ['todo.md', 'notes.txt'],
+    subFolders: {
+      '.team': {
+        name: '.team',
+        files: ['victoria.md', 'seun.md', 'armando.md'],
+        subFolders: {}
+      }
+    }
+  };
+  const GUEST = '__guest__';
+
+  /*
+   * The entries a listing will admit to, sorted.
+   *
+   * The same rule ViewCommand applies on the server, and it has to be the same
+   * rule: the terminal can withhold .team from every listing it prints and the
+   * secret still dies the moment the tree on the left draws it anyway.
+   */
+  function visible(names, showAll) {
+    return [...names].filter((name) => showAll || !name.startsWith('.')).sort();
+  }
+
+  // Node loads this file for its tests, where there is no window to wire to.
+  if (typeof module === 'object' && module.exports) {
+    module.exports = { SEED, visible };
+    return;
+  }
+
   // ---------------------------------------------------------------- config
 
   // Resolved by boot.js, which loads first and needs the address before this
   // file does. Set window.CQ_API before either script to point somewhere else.
   const API = window.CQBoot.API;
-
-  const SEED = { name: 'root', files: ['todo.md', 'notes.txt'], subFolders: {} };
-  const GUEST = '__guest__';
 
   // ---------------------------------------------------------------- storage
 
@@ -288,8 +324,8 @@
     label.textContent = folder.name + '/';
     li.appendChild(label);
 
-    const files = [...(folder.files || [])].sort();
-    const subs = Object.keys(folder.subFolders || {}).sort();
+    const files = visible(folder.files || [], false);
+    const subs = visible(Object.keys(folder.subFolders || {}), false);
     const ul = document.createElement('ul');
 
     if (!files.length && !subs.length) {

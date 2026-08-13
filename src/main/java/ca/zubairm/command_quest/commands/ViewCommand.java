@@ -1,5 +1,7 @@
 package ca.zubairm.command_quest.commands;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Scanner;
 
 import ca.zubairm.command_quest.hub.Folder;
@@ -34,42 +36,68 @@ public class ViewCommand implements Command {
 					null);
 		}
 
-		if (!typed.equals("ls")) {
+		String[] tokens = typed.split("\\s+");
+		boolean showAll = tokens.length == 2 && tokens[0].equals("ls") && tokens[1].equals("-a");
+
+		if (!showAll && !typed.equals("ls")) {
 			// Previously this fell through and printed nothing at all, which
 			// left the player staring at a prompt with no idea they were wrong.
+			//
+			// The message still names 'ls' alone, deliberately. A real shell
+			// does not advertise -a either, and a player who is told about it
+			// here has been handed the secret rather than left to find it.
 			return new CommandResult(
 					CommandResult.Outcome.REJECTED,
 					"Not quite - the command to list a folder is just 'ls'.",
 					"ls");
 		}
 
-		return new CommandResult(CommandResult.Outcome.SUCCEEDED, listing(folder), null);
+		return new CommandResult(CommandResult.Outcome.SUCCEEDED, listing(folder, showAll), null);
 	}
 
 	/** Renders the folder the way ls would: folders first, then files. */
-	private String listing(Folder folder) {
-		if (folder.getFiles().isEmpty() && folder.getSubFolders().isEmpty()) {
+	private String listing(Folder folder, boolean showAll) {
+		List<String> files = visible(folder.getFiles(), showAll);
+		List<String> subFolders = visible(folder.getSubFolders().keySet(), showAll);
+
+		// Judged on what is actually going to be printed, not on what the
+		// folder holds. A folder containing only hidden entries reads as empty,
+		// which is both true from where the player is standing and better than
+		// two headings with nothing underneath them.
+		if (files.isEmpty() && subFolders.isEmpty()) {
 			return "This folder is empty.";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("Files in the current folder:");
-		if (folder.getFiles().isEmpty()) {
+		if (files.isEmpty()) {
 			sb.append("\n(none)");
 		} else {
-			folder.getFiles().stream().sorted().forEach(name -> sb.append("\n- ").append(name));
+			files.forEach(name -> sb.append("\n- ").append(name));
 		}
 
 		sb.append("\n\nSubfolders in the current folder:");
-		if (folder.getSubFolders().isEmpty()) {
+		if (subFolders.isEmpty()) {
 			sb.append("\n(none)");
 		} else {
-			folder.getSubFolders().keySet().stream().sorted()
-					.forEach(name -> sb.append("\n- ").append(name));
+			subFolders.forEach(name -> sb.append("\n- ").append(name));
 		}
 
 		return sb.toString();
+	}
+
+	/**
+	 * The entries ls will admit to, sorted.
+	 *
+	 * A leading dot means hidden, exactly as it does in a real shell - so the
+	 * convention the game teaches is the one the player will meet outside it.
+	 */
+	private static List<String> visible(Collection<String> names, boolean showAll) {
+		return names.stream()
+				.filter(name -> showAll || !name.startsWith("."))
+				.sorted()
+				.toList();
 	}
 
 	/**

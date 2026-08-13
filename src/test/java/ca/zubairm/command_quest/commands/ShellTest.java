@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
+import ca.zubairm.command_quest.Credits;
 import ca.zubairm.command_quest.hub.Folder;
 import ca.zubairm.command_quest.hub.Navigator;
 
@@ -258,5 +259,62 @@ class ShellTest {
         // Map.of() makes no ordering guarantee, so this would fail intermittently
         // across JVM runs if the registry were built with it.
         assertEquals(List.of("touch", "mkdir", "ls", "cd", "pwd"), new Shell().keywords());
+    }
+
+    // ------------------------------------------------------------ hidden
+
+    /**
+     * The credits command is meant to be found, not advertised. Dispatch has to
+     * know it while every list the Shell reads aloud does not - which is why it
+     * lives in a second map rather than in the registry.
+     */
+    @Test
+    @DisplayName("credits runs and names the whole team")
+    void creditsRuns() {
+        Shell.Result run = run(sandbox(), "credits");
+
+        assertEquals("credits", run.commandId());
+        assertTrue(run.result().succeeded());
+
+        for (String member : Credits.members()) {
+            assertTrue(run.result().output().contains(member),
+                    "credits should name " + member + "; got:\n" + run.result().output());
+        }
+    }
+
+    @Test
+    @DisplayName("credits is not listed in help")
+    void creditsStaysOutOfHelp() {
+        String output = run(sandbox(), "help").result().output();
+
+        assertFalse(output.contains("credits"),
+                "a command listed in help is not hidden; got:\n" + output);
+    }
+
+    @Test
+    @DisplayName("credits is not listed when an unknown command is rejected")
+    void creditsStaysOutOfTheVocabulary() {
+        String output = run(sandbox(), "xyzzy").result().output();
+
+        assertFalse(output.contains("credits"),
+                "the vocabulary list would give it away; got:\n" + output);
+    }
+
+    @Test
+    @DisplayName("credits is never offered as a near miss")
+    void creditsIsNeverSuggested() {
+        // One letter short of "credits". The suggester walks the vocabulary, so
+        // this is the check that the hidden map is genuinely outside it.
+        String output = run(sandbox(), "credit").result().output();
+
+        assertFalse(output.contains("Did you mean"), output);
+        assertFalse(output.contains("credits"), output);
+    }
+
+    @Test
+    @DisplayName("credits is not a lesson tab")
+    void creditsIsNotALesson() {
+        assertFalse(new Shell().keywords().contains("credits"),
+                "keywords() drives the browser's lesson tabs");
     }
 }

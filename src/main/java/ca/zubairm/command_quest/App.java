@@ -3,6 +3,7 @@ package ca.zubairm.command_quest;
 import java.util.Scanner;
 
 import ca.zubairm.command_quest.commands.Command;
+import ca.zubairm.command_quest.commands.CreditsCommand;
 import ca.zubairm.command_quest.commands.MkDirCommand;
 import ca.zubairm.command_quest.commands.TouchCommand;
 import ca.zubairm.command_quest.commands.ViewCommand;
@@ -24,11 +25,19 @@ public class App {
 		currentFolder.addFile("todo.md");
 		currentFolder.addFile("notes.txt");
 
+		// The team, hidden the way a real shell hides things: a leading dot, so
+		// only "ls -a" lists it. Seeded from Credits so the names are written
+		// down in exactly one place.
+		currentFolder.addSubFolder(Credits.FOLDER);
+		Folder team = currentFolder.getSubFolders().get(Credits.FOLDER);
+		Credits.fileNames().forEach(team::addFile);
+
 		// Polymorphism - command is an interface, each variable is set to a subclass
 		// (check day 6 in teacher led)
 		Command makeFile = new TouchCommand();
 		Command makeFolder = new MkDirCommand();
 		Command viewFolder = new ViewCommand();
+		Command credits = new CreditsCommand();   // hidden - the menu never mentions it
 		CdCommand cd = new CdCommand();          // navigation: its own contract, not a Command
 
 		// accounts
@@ -52,6 +61,14 @@ public class App {
 				break;
 			}
 			System.out.println("Welcome, " + user.getUsername() + "!\n");
+
+			// One check here rather than four inside LoginScreen: making an
+			// account, logging in, resetting a PIN and continuing as Guest all
+			// arrive at this same line.
+			String greeting = Credits.shoutoutFor(user.getUsername());
+			if (greeting != null) {
+				System.out.println(greeting + "\n");
+			}
 			navigator.toRoot();              // each session starts at root
 
 			boolean loggedIn = true;
@@ -87,6 +104,12 @@ public class App {
 						break;
 					case 4:
 						cd.run(navigator, scanner);
+						break;
+					// Deliberately absent from the menu printed above. The web
+					// build hides its credits in Shell's second map; the console
+					// has a numbered menu, so it hides a number instead.
+					case 7:
+						credits.run(navigator.current(), scanner);
 						break;
 					case 9:
 						System.out.println("Logging out...\n");

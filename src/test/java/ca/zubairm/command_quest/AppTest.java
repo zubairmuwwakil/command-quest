@@ -1,6 +1,7 @@
 package ca.zubairm.command_quest;
 
 import static ca.zubairm.command_quest.TestSupport.runApp;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.DisplayName;
@@ -133,5 +134,80 @@ class AppTest {
         // make a folder, then cd into it - the breadcrumb should update.
         String output = runApp("3", "2", "mkdir projects", "4", "cd projects", "0");
         assertTrue(output.contains("Now in: root/projects"));
+    }
+
+    // ---------- easter eggs ----------
+
+    @Test
+    @DisplayName("greets a player who logs in under a teammate's name")
+    void greetsATeammateAtTheGate() {
+        // 1 = Make Account, username "victoria", PIN, then exit.
+        String output = runApp("1", "victoria", "1234", "0");
+
+        assertTrue(output.contains("Welcome, victoria!"), "the ordinary greeting still happens");
+        assertTrue(output.contains("Victoria Oyedotun"),
+                "expected the shoutout at the gate; got:\n" + output);
+    }
+
+    @Test
+    @DisplayName("an ordinary username gets no shoutout")
+    void saysNothingExtraForAnOrdinaryLogin() {
+        String output = runApp("1", "bob", "1234", "0");
+
+        for (String member : Credits.members()) {
+            assertFalse(output.contains(member), "no egg should fire for bob; got:\n" + output);
+        }
+    }
+
+    @Test
+    @DisplayName("the team folder is hidden from a plain ls")
+    void teamFolderIsHidden() {
+        // guest in, 3 = View current folder, type ls, then exit.
+        String output = runApp("3", "3", "ls", "0");
+
+        assertTrue(output.contains("todo.md"), "the ordinary seed files still list");
+        assertFalse(output.contains(".team"),
+                "a player who types ls must not be handed the secret; got:\n" + output);
+    }
+
+    @Test
+    @DisplayName("ls -a reveals the team folder, and the team is inside it")
+    void dashARevealsTheTeamFolder() {
+        String output = runApp(
+                "3",            // guest
+                "3", "ls -a",   // view folder, listing hidden entries
+                "4", "cd .team",// change folder into it
+                "3", "ls",      // view what is inside
+                "0");           // exit
+
+        assertTrue(output.contains(".team"), "ls -a should reveal it; got:\n" + output);
+        assertTrue(output.contains("victoria.md"), "the team files should be inside; got:\n" + output);
+        assertTrue(output.contains("seun.md"));
+        assertTrue(output.contains("armando.md"));
+    }
+
+    /**
+     * The console has a numbered menu rather than Shell's typed dispatch, so
+     * the hidden command is a number the menu never prints. 42 was already
+     * spoken for as the "unknown option" example, which is exactly why the
+     * secret number cannot be one the tests already treat as meaningless.
+     */
+    @Test
+    @DisplayName("a menu number that is never printed opens the credits")
+    void hiddenMenuNumberShowsTheCredits() {
+        String output = runApp("3", "7", "0");
+
+        for (String member : Credits.members()) {
+            assertTrue(output.contains(member), "credits should name " + member);
+        }
+    }
+
+    @Test
+    @DisplayName("the credits number is absent from the printed menu")
+    void theCreditsNumberIsNotAdvertised() {
+        String output = runApp("3", "0");
+
+        assertFalse(output.contains("7)"),
+                "a number listed in the menu is not hidden; got:\n" + output);
     }
 }

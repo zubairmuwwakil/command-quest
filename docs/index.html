@@ -19,28 +19,32 @@
     <p class="gate-tagline">Learn the command line by using it.</p>
 
     <div id="gate-choices" class="gate-choices">
-      <button class="btn btn-primary" data-gate="new">Make an account</button>
+      <button class="btn btn-primary" data-gate="new">Create a new account</button>
       <button class="btn" data-gate="login">Log in</button>
       <button class="btn btn-ghost" data-gate="guest">Continue as guest</button>
     </div>
 
     <form id="gate-form" class="gate-form" hidden autocomplete="off">
-      <h2 id="gate-form-title" class="gate-form-title">Make an account</h2>
+      <h2 id="gate-form-title" class="gate-form-title">Create your account</h2>
+      <p id="gate-form-desc" class="gate-form-desc">
+        Pick any username and 4-digit code you want to save your progress on this device. You are creating a brand new account right here!
+      </p>
       <label class="field">
-        <span>Username</span>
-        <input id="gate-username" type="text" maxlength="20" required>
+        <span id="gate-username-label">Choose a username</span>
+        <input id="gate-username" type="text" maxlength="20" placeholder="e.g. Alex, Sam, or player1" required>
+        <span id="gate-username-note" class="field-hint">Pick any name or nickname you like.</span>
       </label>
       <label class="field">
-        <span>4-digit code</span>
-        <input id="gate-pin" type="text" inputmode="numeric" pattern="\d{4}" maxlength="4" required>
+        <span id="gate-pin-label">Choose a 4-digit secret code</span>
+        <input id="gate-pin" type="text" inputmode="numeric" pattern="\d{4}" maxlength="4" placeholder="e.g. 1234" required>
+        <span id="gate-pin-note" class="field-hint">Pick any 4 numbers you'll easily remember (e.g. 1234).</span>
       </label>
-      <p class="field-note">
-        Made up for this game only — it never leaves your browser.
-        Don't reuse a real PIN.
+      <p id="gate-field-note" class="field-note">
+        Made up for this game only — it never leaves your browser. Don't use a real bank PIN.
       </p>
       <p id="gate-error" class="gate-error" role="alert" hidden></p>
       <div class="gate-actions">
-        <button type="submit" class="btn btn-primary">Continue</button>
+        <button id="gate-submit-btn" type="submit" class="btn btn-primary">Create Account &amp; Play</button>
         <button type="button" class="btn btn-ghost" data-gate="back">Back</button>
       </div>
     </form>
@@ -109,6 +113,7 @@
       <form id="term-form" class="term-form" autocomplete="off">
         <span class="term-prompt" aria-hidden="true">$</span>
         <input id="term-input" class="term-input" type="text" maxlength="200"
+               placeholder="Type a command (e.g. touch notes.txt) and press Enter..."
                aria-label="Type a command" spellcheck="false" autocapitalize="off">
         <button type="submit" class="btn btn-sm">Run</button>
       </form>
@@ -118,6 +123,7 @@
     <section class="panel panel-files">
       <h2 class="panel-head">Files</h2>
       <div class="panel-body">
+        <p class="panel-subhead">Live folder preview</p>
         <p class="breadcrumb"><code id="breadcrumb">root</code></p>
         <ul id="tree" class="tree"></ul>
       </div>

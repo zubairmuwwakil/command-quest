@@ -98,7 +98,27 @@
       if (mode === 'back') { showGate(); return; }
 
       gateMode = mode;
-      $('gate-form-title').textContent = mode === 'new' ? 'Make an account' : 'Log in';
+      const isNew = mode === 'new';
+
+      $('gate-form-title').textContent = isNew ? 'Create a new account' : 'Log in to your account';
+      $('gate-form-desc').textContent = isNew
+        ? 'Pick any username and 4-digit code you want. This saves your progress on this device so you can pick up where you left off!'
+        : 'Enter the username and 4-digit code you created earlier to continue your saved game.';
+
+      $('gate-username-label').textContent = isNew ? 'Choose a username' : 'Your username';
+      $('gate-username').placeholder = isNew ? 'e.g. Alex, Sam, or player1' : 'Enter your username';
+      $('gate-username-note').textContent = isNew ? 'Pick any name or nickname you like.' : 'The name you used when you created your account.';
+
+      $('gate-pin-label').textContent = isNew ? 'Choose a 4-digit secret code' : 'Your 4-digit code';
+      $('gate-pin').placeholder = isNew ? 'e.g. 1234' : 'Enter your 4-digit code';
+      $('gate-pin-note').textContent = isNew ? 'Pick any 4 numbers you\'ll easily remember (e.g. 1234).' : 'The 4-digit number you chose when you registered.';
+
+      $('gate-field-note').textContent = isNew
+        ? 'Made up for this game only — it never leaves your browser. Don\'t use a real bank PIN.'
+        : 'Your code is saved securely in this browser.';
+
+      $('gate-submit-btn').textContent = isNew ? 'Create Account & Play' : 'Log In';
+
       $('gate-choices').hidden = true;
       $('gate-form').hidden = false;
       $('gate-error').hidden = true;
@@ -112,18 +132,20 @@
     const pin = $('gate-pin').value.trim();
     const fail = (msg) => { $('gate-error').textContent = msg; $('gate-error').hidden = false; };
 
-    // The console version accepts an empty username; this does not.
-    if (!name) return fail('Please choose a username.');
-    if (!/^\d{4}$/.test(pin)) return fail('The code must be exactly 4 digits.');
+    // Clear and non-technical validation checks
+    if (!name) return fail(gateMode === 'new' ? 'Please choose a username for your account.' : 'Please enter your username.');
+    if (!/^\d{4}$/.test(pin)) return fail('Please enter a 4-digit code using numbers only (e.g. 1234).');
 
     const users = store.users();
 
     if (gateMode === 'new') {
-      if (users[name]) return fail('That username is taken. Try another.');
+      if (users[name]) return fail('That username is already taken on this browser. Please choose a different name.');
       users[name] = { pin };
       store.saveUsers(users);
     } else {
-      if (!users[name] || users[name].pin !== pin) return fail('Wrong username or code.');
+      if (!users[name] || users[name].pin !== pin) {
+        return fail('We couldn\'t find an account matching that username and code. If you haven\'t made an account yet, click Back and choose "Create a new account".');
+      }
     }
 
     startSession(name);
@@ -150,11 +172,13 @@
 
     $('gate').hidden = true;
     $('game').hidden = false;
-    $('who').textContent = user === GUEST ? 'guest' : user;
+    $('who').textContent = user === GUEST ? 'guest (temporary session)' : `${user} (saved)`;
 
     $('term').innerHTML = '';
-    print('Welcome to Command Quest. Type any command you like — '
-        + 'help lists them, and the lessons on the left are there whenever you want them.', 'term-hint');
+    print('Welcome to Command Quest! Learn the command line step-by-step: '
+        + 'follow the lessons on the left, type commands into the terminal here, '
+        + 'and watch your files & folders appear live on the right. '
+        + 'Type "help" anytime to see all available commands.', 'term-hint');
 
     renderLessonTabs();
     if (lessonIds.length) selectLesson(state.lessonId);
@@ -224,7 +248,7 @@
 
   function setTerminalEnabled(on) {
     $('term-input').disabled = !on;
-    $('term-input').placeholder = on ? '' : 'waiting for the server…';
+    $('term-input').placeholder = on ? 'Type a command (e.g. touch notes.txt) and press Enter...' : 'waiting for the server…';
     $('term-form').querySelector('button[type="submit"]').disabled = !on;
   }
 

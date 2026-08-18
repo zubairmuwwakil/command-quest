@@ -104,8 +104,8 @@ Knowing where an abstraction does not fit is part of the design.
 ./mvnw clean test
 ```
 
-122 tests, none skipped. Line coverage 93.1%; the report lands at
-`target/site/jacoco/index.html`.
+198 automated tests — 184 Java and 14 browser-side — none skipped. Java line
+coverage is 95.7%; the report lands at `target/site/jacoco/index.html`.
 
 The domain is tested without any Spring context, the web layer with `@WebMvcTest`
 slices, and there is a round-trip test for the folder tree specifically — in a

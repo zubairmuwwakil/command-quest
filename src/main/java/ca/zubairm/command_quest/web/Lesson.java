@@ -31,40 +31,40 @@ public record Lesson(String title, String body, String example) {
         lessons.put("touch", new Lesson(
                 "Make a file",
                 """
-                To make a file, type the touch command, then the name you want \
-                the file to have, then the file extension.""",
+                To make a file, type the touch command, followed by a filename and \
+                extension. A file extension tells the computer what type of file it \
+                is, like .txt for text notes or .md for markdown.""",
                 "touch chicken.leg"));
 
         lessons.put("mkdir", new Lesson(
                 "Make a folder",
                 """
-                To make a folder, type the mkdir command - short for "make \
-                directory" - then the name you want the folder to have. \
-                Folders take no extension.""",
+                To make a folder, type the mkdir command — short for "make directory" \
+                (in computing, "directory" is just another word for folder) — followed \
+                by the folder name. Folders do not need file extensions.""",
                 "mkdir homework"));
 
         lessons.put("ls", new Lesson(
                 "View this folder",
                 """
-                Type ls - short for "list" - to see what is in the folder you \
-                are standing in. It shows only this folder, not the ones inside it.""",
+                Type ls — short for "list" — to see all the files and folders inside \
+                the folder you are currently in. It lists only this folder's contents.""",
                 "ls"));
 
         lessons.put("cd", new Lesson(
                 "Change folder",
                 """
-                Type cd - short for "change directory" - then where you want to \
-                go. Use cd <name> to go into a folder, cd .. to go up one level, \
-                and cd / to jump back to root.""",
+                Type cd — short for "change directory" — to move between folders. \
+                Use cd <name> to enter a folder, cd .. to go back up one folder, \
+                and cd / to jump all the way back to the root folder.""",
                 "cd photos"));
 
         lessons.put("pwd", new Lesson(
                 "Find where you are",
                 """
-                Type pwd - short for "print working directory" - to see the \
-                whole path from root down to the folder you are standing in. \
-                It takes no name. Once you have used cd a few times, this is \
-                how you get your bearings back.""",
+                Type pwd — short for "print working directory" — to see your exact \
+                location path starting from root down to your current folder. \
+                It takes no extra name and helps you get your bearings back anytime.""",
                 "pwd"));
 
         return lessons;

@@ -77,8 +77,9 @@ code { font-family: var(--mono); }
 .gate-tagline { margin: .3rem 0 1.6rem; color: var(--ink-dim); }
 .gate-choices { display: grid; gap: .6rem; }
 .gate-form { display: grid; gap: .9rem; }
-.gate-form-title { margin: 0; font-size: 1.05rem; }
-.field { display: grid; gap: .3rem; font-size: .9rem; color: var(--ink-dim); }
+.gate-form-title { margin: 0; font-size: 1.1rem; font-weight: 600; }
+.gate-form-desc { margin: -.3rem 0 .2rem; font-size: .85rem; color: var(--ink-dim); line-height: 1.45; }
+.field { display: grid; gap: .3rem; font-size: .9rem; color: var(--ink); }
 .field input {
   font: inherit;
   font-family: var(--mono);
@@ -88,10 +89,12 @@ code { font-family: var(--mono); }
   border: 1px solid var(--line);
   border-radius: var(--radius);
 }
+.field input::placeholder { color: var(--ink-dim); opacity: .55; }
 .field input:focus { outline: none; border-color: var(--accent); }
-.field-note { margin: -.3rem 0 0; font-size: .8rem; color: var(--ink-dim); }
-.gate-error { margin: 0; color: var(--error); font-size: .9rem; }
-.gate-actions { display: flex; gap: .6rem; }
+.field-hint { font-size: .78rem; color: var(--ink-dim); margin-top: -.1rem; }
+.field-note { margin: -.1rem 0 0; font-size: .8rem; color: var(--ink-dim); line-height: 1.4; }
+.gate-error { margin: 0; color: var(--error); font-size: .85rem; line-height: 1.4; }
+.gate-actions { display: flex; gap: .6rem; margin-top: .2rem; }
 
 /* ---------- boot panel ---------- */
 /*
@@ -272,6 +275,7 @@ code { font-family: var(--mono); }
 .btn:disabled:hover { border-color: var(--line); }
 
 /* files */
+.panel-subhead { margin: 0 0 .6rem; font-size: .8rem; color: var(--ink-dim); opacity: .85; }
 .breadcrumb { margin: 0 0 .7rem; font-size: .85rem; color: var(--ink-dim); }
 .breadcrumb code { color: var(--folder); }
 .tree { list-style: none; margin: 0; padding: 0; font-family: var(--mono); font-size: .875rem; }

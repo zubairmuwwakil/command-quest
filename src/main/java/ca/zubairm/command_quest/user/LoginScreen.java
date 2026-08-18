@@ -39,6 +39,8 @@ public class LoginScreen {
 
             switch (choice) {
             case 1: {
+                System.out.println("\n--- Create a New Account ---");
+                System.out.println("Pick any username and 4-digit PIN you like to save your progress.");
                 System.out.print("\nChoose a username: ");
                 String username = scanner.nextLine().trim();
 
@@ -47,7 +49,7 @@ public class LoginScreen {
                     break;
                 }
 
-                System.out.print("Choose a 4-digit PIN: ");
+                System.out.print("Choose a 4-digit PIN (e.g. 1234): ");
                 String pin = scanner.nextLine().trim();
 
                 if (!pin.matches("\\d{4}")) {
